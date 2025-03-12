@@ -2,10 +2,12 @@ import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 
 export const updateSession = async (request: NextRequest) => {
-  // This `try/catch` block is only here for the interactive tutorial.
-  // Feel free to remove once you have Supabase connected.
   try {
-    // Create an unmodified response
+    // التحقق من المتغيرات البيئية
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      throw new Error("Supabase environment variables (NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY) are not set.");
+    }
+
     let response = NextResponse.next({
       request: {
         headers: request.headers,
@@ -35,24 +37,20 @@ export const updateSession = async (request: NextRequest) => {
       },
     );
 
-    // This will refresh session if expired - required for Server Components
-    // https://supabase.com/docs/guides/auth/server-side/nextjs
-    const user = await supabase.auth.getUser();
+    // جلب معلومات المستخدم
+    const { data: user, error: userError } = await supabase.auth.getUser();
 
-    // protected routes
-    if (request.nextUrl.pathname.startsWith("/protected") && user.error) {
+    // حماية المسارات التي تبدأ بـ /account/*
+    if (request.nextUrl.pathname.startsWith("/account") && userError) {
+      // إذا لم يكن المستخدم مصادقًا، أعده إلى صفحة تسجيل الدخول
       return NextResponse.redirect(new URL("/sign-in", request.url));
     }
 
-    if (request.nextUrl.pathname === "/" && !user.error) {
-      return NextResponse.redirect(new URL("/protected", request.url));
-    }
-
+    // السماح بالوصول لجميع الصفحات الأخرى بغض النظر عن حالة المصادقة
     return response;
+
   } catch (e) {
-    // If you are here, a Supabase client could not be created!
-    // This is likely because you have not set up environment variables.
-    // Check out http://localhost:3000 for Next Steps.
+    console.error("Failed to process session:", e);
     return NextResponse.next({
       request: {
         headers: request.headers,
