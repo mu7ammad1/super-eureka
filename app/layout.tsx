@@ -1,10 +1,11 @@
-import { Inter, DM_Sans } from "next/font/google";
+import { Inter } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
 import Nav from "@/components/nav";
+import { env } from "process";
 
-const defaultUrl = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
+const defaultUrl = env.VERCEL_URL
+  ? `https://${env.VERCEL_URL}`
   : "http://localhost:3000";
 
 export const metadata = {
