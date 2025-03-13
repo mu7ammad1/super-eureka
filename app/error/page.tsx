@@ -4,9 +4,9 @@ export default function Error() {
 
   return (
     <div>
-      <p> حدث خطأ، يرجى إعادة المحاولة لاحقًا.</p>
+      <p>An error occurred, please try again later.</p>
       <Button variant={"secondary"} size={"default"}>
-        اعد المحاولة
+        Retry
       </Button>
     </div>
   );
