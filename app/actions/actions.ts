@@ -132,3 +132,103 @@ export const signOutAction = async () => {
   await supabase.auth.signOut();
   return redirect("/");
 };
+
+
+
+
+
+
+
+
+
+export async function signInWithGoogleAction() {
+  const supabase = await createClient();
+  const origin = (await headers()).get("origin");
+
+  try {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${origin}/auth/callback`,
+        queryParams: {
+          access_type: "offline",
+          prompt: "consent",
+        },
+      },
+    });
+
+    if (error) {
+      console.error("Google OAuth Error:", error.message);
+      return encodedRedirect(
+        "error",
+        "/sign-in",
+        error.message || "فشل تسجيل الدخول عبر Google"
+      );
+    }
+
+    if (!data?.url) {
+      console.error("No redirect URL returned from Supabase");
+      return encodedRedirect(
+        "error",
+        "/sign-in",
+        "حدث خطأ أثناء محاولة تسجيل الدخول عبر Google"
+      );
+    }
+
+    // بدل ما نعمل redirect مباشرة، نرجع الـ URL للـ client
+    return { success: true, redirectUrl: data.url };
+  } catch (unexpectedError) {
+    console.error("Unexpected error during Google sign-in:", unexpectedError);
+    return encodedRedirect(
+      "error",
+      "/sign-in",
+      "حدث خطأ غير متوقع أثناء تسجيل الدخول"
+    );
+  }
+}
+
+export async function signInWithFacebookAction() {
+  const supabase = await createClient();
+  const origin = (await headers()).get("origin");
+
+  try {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "facebook",
+      options: {
+        redirectTo: `${origin}/auth/callback`,
+        queryParams: {
+          access_type: "offline",
+          prompt: "consent",
+        },
+      },
+    });
+
+    if (error) {
+      console.error("facebook OAuth Error:", error.message);
+      return encodedRedirect(
+        "error",
+        "/sign-in",
+        error.message || "فشل تسجيل الدخول عبر facebook"
+      );
+    }
+
+    if (!data?.url) {
+      console.error("No redirect URL returned from Supabase");
+      return encodedRedirect(
+        "error",
+        "/sign-in",
+        "حدث خطأ أثناء محاولة تسجيل الدخول عبر facebook"
+      );
+    }
+
+    // بدل ما نعمل redirect مباشرة، نرجع الـ URL للـ client
+    return { success: true, redirectUrl: data.url };
+  } catch (unexpectedError) {
+    console.error("Unexpected error during facebook sign-in:", unexpectedError);
+    return encodedRedirect(
+      "error",
+      "/sign-in",
+      "حدث خطأ غير متوقع أثناء تسجيل الدخول"
+    );
+  }
+}

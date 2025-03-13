@@ -15,6 +15,7 @@ import Link from "next/link"
 import { SubmitButton } from "./submit-button"
 import { signUpAction } from "@/app/actions/actions"
 import { X } from "lucide-react"
+import SignInWithGoogleButton from "./SignInWith0AuthButton"
 
 
 
@@ -34,6 +35,8 @@ export default function DialogAuthUp() {
                         </Link>
                     </DialogDescription>
                 </DialogHeader>
+                <SignInWithGoogleButton />
+                <hr className="mt-4 border-foreground h-0.5 border-dotted dotted" />
                 <ElementSignIn />
                 <DialogFooter className="sm:justify-start absolute top-5 right-5">
                     <DialogClose asChild>
@@ -52,7 +55,7 @@ export default function DialogAuthUp() {
 const ElementSignIn = (props: any) => {
     return (
         <form className="flex flex-col w-full min-w-64 mx-auto">
-            <div className="flex w-full flex-col gap-2 [&>input]:mb-3 mt-8">
+            <div className="flex w-full flex-col gap-2 [&>input]:mb-3 mt-3">
                 <Label htmlFor="email">Email</Label>
                 <Input name="email" placeholder="you@example.com" required />
                 <Label htmlFor="password">Password</Label>

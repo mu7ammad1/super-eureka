@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { SmtpMessage } from "../smtp-message";
+import OneTapComponent from "@/components/SignInWith0AuthButton";
 
 export default async function Signup(props: {
   searchParams: Promise<Message>;
@@ -45,6 +46,7 @@ export default async function Signup(props: {
           <FormMessage message={searchParams} />
         </div>
       </form>
+      <OneTapComponent />
       <SmtpMessage />
     </>
   );

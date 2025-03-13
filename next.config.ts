@@ -6,8 +6,14 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "tjdtfpzcspfqgtoqpckp.supabase.co",
-        port: "", // Leave empty unless using a custom port
-        pathname: "/storage/v1/object/public/photos/**", // Adjust path as needed
+        port: "",
+        pathname: "/storage/v1/object/public/photos/**",
+      },
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+        port: "",
+        pathname: "/a/**", // لتغطية صور بروفايل Google
       },
     ],
   },

@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/drawer"
 import { CoinsIcon, X } from "lucide-react"
 import Link from "next/link"
+import SignInWithGoogleButton from "./SignInWith0AuthButton"
 
 
 export function SearchAndmenu() {
