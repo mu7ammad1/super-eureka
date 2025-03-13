@@ -2,10 +2,9 @@ import { Inter } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
 import Nav from "@/components/nav";
-import { env } from "process";
-
-const defaultUrl = env.VERCEL_URL
-  ? `https://${env.VERCEL_URL}`
+import { Analytics } from "@vercel/analytics/react"
+const defaultUrl = process.env.VERCEL_URL
+  ? `https://lexnes.vercel.app`
   : "http://localhost:3000";
 
 export const metadata = {
@@ -52,6 +51,7 @@ export default function RootLayout({
 
           </main>
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );
