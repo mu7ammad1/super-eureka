@@ -1,4 +1,5 @@
-"use client"; // Add this since we need client-side interactivity
+"use client";
+
 import React, { useState } from "react";
 import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
@@ -8,29 +9,34 @@ import {
     Drawer,
     DrawerContent,
     DrawerTrigger,
-} from "@/components/ui/drawer"
+} from "@/components/ui/drawer";
 import { DialogTitle } from "./ui/dialog";
+import { TextToImage } from "@/app/actions/imagine";
 
 type Status = {
-    Style: string
-    label: string[]
-}
+    Style: string;
+    label: string[];
+};
+
+import { usePathname } from 'next/navigation';
 
 export default function HeadSearch() {
-    const [prompt, setPrompt] = useState(""); // State to control Textarea value
-
-    const [open, setOpen] = React.useState(false)
-    const [selectedStatus, setSelectedStatus] = React.useState<Status | null>(null)
+    const [prompt, setPrompt] = useState("");
+    const [open, setOpen] = useState(false);
+    const [selectedStatus, setSelectedStatus] = useState<Status | null>(null);
+    const [imageUrl, setImageUrl] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
 
     const statuses: Status[] = [
         {
-            Style: "Abstract",
+            Style: "Realistic",
             label: [
-                "Overlapping circles in blue and yellow, random intersecting lines.",
-                "Floating squares in a red void, black shadows beneath.",
-                "A wavy shape moving across a green background, glowing dots scattered.",
-                "Tangled lines in gradient colors, dynamic energetic feel.",
-                "Random colorful splotches, red, black, and purple, no defined shapes.",
+                "A tropical forest after rain, glossy green leaves, light mist, sunlight piercing through the trees.",
+                "A snow-covered mountain at sunrise, clear blue sky, an eagle soaring above the peak.",
+                "A bustling street market, vibrant colors of fruits and vegetables, people selling goods.",
+                "A small boat in the middle of a calm lake, mountain reflections on the water, white clouds.",
+                "A modern city street at night, glowing car lights and skyscrapers, lively atmosphere.",
             ]
         },
         {
@@ -94,7 +100,7 @@ export default function HeadSearch() {
             ]
         },
         {
-            Style: "Black & White",
+            Style: "flux-dev-fast",
             label: [
                 "An abandoned factory, rusty machinery, high contrast, gloomy atmosphere.",
                 "A city under rain, people with umbrellas, reflections on wet streets.",
@@ -104,7 +110,7 @@ export default function HeadSearch() {
             ]
         },
         {
-            Style: "Oil Painting",
+            Style: "flux-dev",
             label: [
                 "An apple orchard in spring, warm colors, soft brushstrokes blending together.",
                 "A village by a riverbank, cloudy sky, water reflections in rich hues.",
@@ -114,7 +120,7 @@ export default function HeadSearch() {
             ]
         },
         {
-            Style: "Sci-Fi",
+            Style: "flux-schnell",
             label: [
                 "An alien planet with three suns, glowing plants, strange creatures moving in the background.",
                 "A spaceship landing on a dusty moon, swirling dust, neon lights glowing.",
@@ -124,7 +130,7 @@ export default function HeadSearch() {
             ]
         },
         {
-            Style: "Cartoon",
+            Style: "anime",
             label: [
                 "A superhero flying over a colorful city, bright tones, exaggerated building shapes.",
                 "A family of cute cats living in a treehouse, cheerful details, blue sky with fluffy clouds.",
@@ -133,101 +139,148 @@ export default function HeadSearch() {
                 "A car race on a colorful track, exaggerated car designs, cheering crowd.",
             ]
         },
-        {
-            Style: "Realistic",
-            label: [
-                "A tropical forest after rain, glossy green leaves, light mist, sunlight piercing through the trees.",
-                "A snow-covered mountain at sunrise, clear blue sky, an eagle soaring above the peak.",
-                "A bustling street market, vibrant colors of fruits and vegetables, people selling goods.",
-                "A small boat in the middle of a calm lake, mountain reflections on the water, white clouds.",
-                "A modern city street at night, glowing car lights and skyscrapers, lively atmosphere.",
-            ]
-        },
-    ]
-    // Function to randomize the prompt and style
+    ];
+
     const randomizePromptAndStyle = () => {
         const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
         const randomPrompt = randomStatus.label[Math.floor(Math.random() * randomStatus.label.length)];
         setSelectedStatus(randomStatus);
         setPrompt(randomPrompt);
-    }
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        const Pathname = usePathname();
+
+        e.preventDefault();
+        if (!prompt) {
+            setError("Please enter a prompt");
+            return;
+        }
+        // if (Pathname.toString = "/imagine") {
+        //     setError("Please select a style");
+        //     return;
+        // }
+
+        const formData = new FormData();
+        formData.append("prompt", prompt);
+        formData.append("style", selectedStatus?.Style.toLowerCase() || "realistic");
+        formData.append("aspect_ratio", "1:1"); // Default value, could be made configurable
+        formData.append("seed", `${Math.random().toString().split(".")[1]}`); // Default value, could be made configurable
+
+        setLoading(true);
+        setError(null);
+        setImageUrl(null);
+
+        const result = await TextToImage(formData);
+
+        if (result.success && result.imageBase64) {
+            const byteCharacters = atob(result.imageBase64);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob = new Blob([byteArray], { type: "image/png" });
+            const url = URL.createObjectURL(blob);
+            setImageUrl(url);
+            console.log("Image generated successfully");
+        } else {
+            setError(result.error || "Unknown error occurred");
+        }
+
+        setLoading(false);
+    };
 
     return (
         <div className="flex flex-col w-full max-w-3xl items-center border p-2 rounded-3xl bg-neutral-100 placeholder:text-black dark:bg-secondary border-none box">
-            <Textarea
-                placeholder="Tell us what you want to imagine today?"
-                value={prompt} // Controlled by state
-                onChange={(e) => setPrompt(e.target.value)}
-                className="border-0 block w-full resize-none shadow-none focus-visible:ring-offset-0 focus-visible:ring-0 md:text-lg tracking-normal bg-transparent placeholder:text-primary/40"
-            />
-            <div className="flex items-center w-full justify-between">
-                <div className="flex items-center gap-2 justify-between *:bg-primary-foreground">
-                    <Button
-                        type="button"
-                        variant={"secondary"}
-                        size={"icon"}
-                        className="rounded-full"
-                        onClick={randomizePromptAndStyle} // Call the randomize function on click
-                    >
-                        <Settings2Icon className="h-4 w-4" />
-                    </Button>
-                    <Button
-                        type="button"
-                        variant={"secondary"}
-                        size={"icon"}
-                        className="rounded-full"
-                        onClick={randomizePromptAndStyle} // Call the randomize function on click
-                    >
-                        <DicesIcon className="h-4 w-4" />
-                    </Button>
-                    <Drawer open={open} onOpenChange={setOpen}>
-                        <DrawerTrigger asChild>
-                            <Button variant="outline" className="rounded-full justify-start">
-                                {selectedStatus ? <>{selectedStatus.Style}</> : <>+ Set Style</>}
-                            </Button>
-                        </DrawerTrigger>
-                        <DrawerContent>
-                            <DialogTitle className="hidden">Set Style</DialogTitle>
-                            <div className="mt-4 border-t">
-                                <main>
-                                    <section>
-                                        <h1>No results found.</h1>
-                                        <section className="*:flex *:flex-wrap *:*:w-1/6 *:*:max-md:w-1/4 *:*:max-sm:w-1/3 *:gap-0 w-full h-96">
-                                            {statuses.map((status) => (
-                                                <Button
-                                                    key={status.Style}
-                                                    value={status.Style}
-                                                    onClick={(e) => {
-                                                        const value = (e.target as HTMLButtonElement).value;
-                                                        setSelectedStatus(
-                                                            statuses.find((priority) => priority.Style === value) || null
-                                                        );
-                                                        setOpen(false);
-                                                    }}
-                                                    className="h-32 w-full"
-                                                >
-                                                    {status.Style}
-                                                </Button>
-                                            ))}
+            <form onSubmit={handleSubmit} className="w-full">
+                <Textarea
+                    placeholder="Tell us what you want to imagine today?"
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value)}
+                    className="border-0 block w-full resize-none shadow-none focus-visible:ring-offset-0 focus-visible:ring-0 md:text-lg tracking-normal bg-transparent placeholder:text-primary/40"
+                    disabled={loading}
+                />
+                <div className="flex items-center w-full justify-between">
+                    <div className="flex items-center gap-2 justify-between *:bg-primary-foreground">
+                        <Button
+                            type="button"
+                            variant={"secondary"}
+                            size={"icon"}
+                            className="rounded-full"
+                            onClick={randomizePromptAndStyle}
+                            disabled={loading}
+                        >
+                            <Settings2Icon className="h-4 w-4" />
+                        </Button>
+                        <Button
+                            type="button"
+                            variant={"secondary"}
+                            size={"icon"}
+                            className="rounded-full"
+                            onClick={randomizePromptAndStyle}
+                            disabled={loading}
+                        >
+                            <DicesIcon className="h-4 w-4" />
+                        </Button>
+                        <Drawer open={open} onOpenChange={setOpen}>
+                            <DrawerTrigger asChild>
+                                <Button variant="outline" size={"default"} className="rounded-full justify-start" disabled={loading}>
+                                    {selectedStatus ? <>{selectedStatus.Style}</> : <>+ Set Style</>}
+                                </Button>
+                            </DrawerTrigger>
+                            <DrawerContent>
+                                <DialogTitle className="hidden">Set Style</DialogTitle>
+                                <div className="mt-4 border-t">
+                                    <main>
+                                        <section>
+                                            <section className="flex flex-wrap justify-center items-start gap-5 *:w-[15.666667%] *:max-md:w-[24.5%] *:max-sm:w-[47%] w-full mt-2 max-h-96 scroll- overflow-y-auto">
+                                                {statuses.map((status) => (
+                                                    <Button
+                                                        key={status.Style}
+                                                        value={status.Style}
+                                                        onClick={(e) => {
+                                                            const value = (e.target as HTMLButtonElement).value;
+                                                            setSelectedStatus(
+                                                                statuses.find((priority) => priority.Style === value) || null
+                                                            );
+                                                            setOpen(false);
+                                                        }}
+                                                        className="h-32 w-full"
+                                                        disabled={loading}
+                                                    >
+                                                        {status.Style}
+                                                    </Button>
+                                                ))}
+                                            </section>
                                         </section>
-                                    </section>
-                                </main>
-                            </div>
-                        </DrawerContent>
-                    </Drawer>
-                    <Button type="submit" variant={"secondary"} size={"default"} className="rounded-full">
-                        Add style
+                                    </main>
+                                </div>
+                            </DrawerContent>
+                        </Drawer>
+                        <Button type="button" variant={"secondary"} size={"default"} className="rounded-full" disabled={loading}>
+                            Add style
+                        </Button>
+                    </div>
+                    <Button
+                        type="submit"
+                        variant={"default"}
+                        size={"icon"}
+                        className="rounded-full w-auto h-auto p-2"
+                        disabled={loading}
+                    >
+                        {loading ? "Generating..." : <ArrowRightIcon className="h-5 w-5" />}
                     </Button>
                 </div>
-                <Button
-                    type="submit"
-                    variant={"default"}
-                    size={"icon"}
-                    className="rounded-full w-auto h-auto p-2"
-                >
-                    <ArrowRightIcon className="h-5 w-5" />
-                </Button>
-            </div>
+            </form>
+
+            {imageUrl && (
+                <div className="mt-4">
+                    <img src={imageUrl} alt="Generated Image" style={{ maxWidth: "100%" }} />
+                </div>
+            )}
+
+            {error && <p className="mt-2" style={{ color: "red" }}>{error}</p>}
         </div>
     );
 }

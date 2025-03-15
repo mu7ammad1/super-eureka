@@ -55,8 +55,9 @@ export default function PricingComparison() {
         {/* Pro Plan */}
         <div className="flex flex-col">
           <div className="mb-6">
-            <h2 className="text-4xl font-bold border-b border-primary/40 border-dashed border-spacing-10 pb-3">
-              $9.99 <span className="text-lg font-normal text-primary/70">/month</span>
+            <h2 className="text-4xl font-bold border-b border-primary/40 border-dashed border-spacing-10 pb-3 grid grid-cols-3 items-center justify-between">
+              $9.99 <span className="text-lg font-normal text-primary/70 max-sm:ml-1"> /month</span> <span className="text-lg font-extrabold text-stone-900 bg-white text-center rounded-full">Popular</span>
+              
             </h2>
             <h3 className="text-2xl font-semibold mt-4">Pro Plan</h3>
             <p className="text-primary/70 mt-2">Elevate Your Creative Vision!</p>

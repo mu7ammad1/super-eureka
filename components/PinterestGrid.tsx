@@ -11,7 +11,7 @@ interface Photo {
 // Move Supabase client creation outside the component
 const supabase = createClient();
 
-export default function PinterestGrid() {
+export default function PinterestGrid({ imageUrls }: { imageUrls: any[] }) {
   const [imageHeights, setImageHeights] = useState<number[]>([]);
   const [images, setImages] = useState<Photo[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,7 +42,7 @@ export default function PinterestGrid() {
     if (!images.length) return;
 
     const heights: number[] = new Array(images.length).fill(0);
-    let loadedImages = 0;
+    let loadedImages = 5;
 
     images.forEach((img, index) => {
       const image = new window.Image();
@@ -68,22 +68,40 @@ export default function PinterestGrid() {
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <div className="w-full columns-2 sm:columns-2 md:columns-2 lg:columns-4 gap-4">
+    <div className="w-full columns-4 max-sm:columns-2 max-md:columns-2 max-lg:columns-4 gap-4">
+      {images.length === 0 && <div>No images found</div>}
       {images.map((image, index) => (
         <div
           key={index}
-          className="mb-4 break-inside-avoid"
+          className="mb-4"
         >
           <Image
-            src={`https://tjdtfpzcspfqgtoqpckp.supabase.co/storage/v1/object/public/photos//${image.url}`}
+            src={`https://tjdtfpzcspfqgtoqpckp.supabase.co/storage/v1/object/public/imagenfly//${image.url}`}
             alt={`Image ${index}`}
-            width={500}
+            width={300}
             height={imageHeights[index] || 300}
             className="w-full h-auto object-contain rounded-xl"
             loading="lazy"
           />
         </div>
       ))}
+      {imageUrls && imageUrls.map((imageUrl, index) => (
+        <div
+          key={index}
+          className="mb-4"
+        >
+          <Image
+            src={imageUrl}
+            alt={`Image ${index}`}
+            width={300}
+            style={{ maxWidth: "100%" }}
+            height={imageHeights[index] || 300}
+            className="w-full h-auto object-contain rounded-xl"
+            loading="lazy"
+          />
+        </div>
+      ))}
+
     </div>
   );
 }
