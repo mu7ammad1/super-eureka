@@ -76,7 +76,7 @@ export default function PinterestGrid({ imageUrls }: { imageUrls: any[] }) {
           className="mb-4"
         >
           <Image
-            src={`https://tjdtfpzcspfqgtoqpckp.supabase.co/storage/v1/object/public/imagenfly//${image.url}`}
+            src={image.url}
             alt={`Image ${index}`}
             width={300}
             height={imageHeights[index] || 300}
