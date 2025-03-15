@@ -12,10 +12,10 @@ export default function HomeScreen() {
         </h1>
         <HeadSearch />
       </section>
-      
+
       <h1 className="flex justify-start items-center w-full text-3xl space-x-3"><PopcornIcon absoluteStrokeWidth /><span>Style</span></h1>
 
-      <PinterestGrid />
+      <PinterestGrid imageUrls={[]} />
 
       {/* <Footer /> */}
     </div>
