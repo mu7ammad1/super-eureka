@@ -215,7 +215,7 @@ export default function NewScreen() {
 
       const photosData = results.map((result) => ({
         url: result.url,
-        prompt, // تصحيح "promp" إلى "prompt"
+        promp: prompt,
         style: selectedStatus?.Style || "realistic",
       }));
 
@@ -242,7 +242,7 @@ export default function NewScreen() {
         <section className="w-full flex flex-col justify-center gap-4 mb-40">
           <PinterestGrid imageUrls={imageUrls} />
         </section>
-        <section className="fixed left-0 right-0 bottom-0 z-50 flex justify-center items-center">
+        <section className="fixed left-0 right-0 bottom-5 z-50 flex justify-center items-center">
           <section className="flex flex-col w-full max-w-3xl items-center border p-2 rounded-3xl bg-neutral-100 placeholder:text-black dark:bg-secondary border-none box">
             <form onSubmit={handleSubmit} className="w-full">
               {error && (
@@ -251,7 +251,7 @@ export default function NewScreen() {
                 </p>
               )}
               <Textarea
-                placeholder="Tell us what you want to imagine today?"
+                placeholder="Prompt"
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 className="border-0 block w-full resize-none shadow-none focus-visible:ring-offset-0 focus-visible:ring-0 md:text-lg tracking-normal bg-transparent placeholder:text-primary/40"
