@@ -22,7 +22,8 @@ export default function PinterestGrid({ imageUrls }: { imageUrls: string[] | nul
         setLoading(true);
         const { data, error } = await supabase
           .from("photos")
-          .select("*");
+          .select("*")
+          .order("id", { ascending: false });
 
         if (error) throw error;
         setImages(data || []);
@@ -69,21 +70,6 @@ export default function PinterestGrid({ imageUrls }: { imageUrls: string[] | nul
   return (
     <div className="w-full flex *:w-1/4 flex-wrap">
       {images.length === 0 && <div>No images found</div>}
-      {images.map((image, index) => (
-        <div
-          key={index}
-          className="p-2"
-        >
-          <Image
-            src={image.url}
-            alt={`Image ${index}`}
-            width={300}
-            height={imageHeights[index] || 300}
-            className="w-full h-auto object-contain rounded-xl"
-            loading="lazy"
-          />
-        </div>
-      ))}
       {imageUrls && imageUrls.map((imageUrl, index) => (
         <div
           key={index}
@@ -100,6 +86,22 @@ export default function PinterestGrid({ imageUrls }: { imageUrls: string[] | nul
           />
         </div>
       ))}
+      {images.map((image, index) => (
+        <div
+          key={index}
+          className="p-2"
+        >
+          <Image
+            src={image.url}
+            alt={`Image ${index}`}
+            width={300}
+            height={imageHeights[index] || 300}
+            className="w-full h-auto object-contain rounded-xl"
+            loading="lazy"
+          />
+        </div>
+      ))}
+
 
     </div>
   );

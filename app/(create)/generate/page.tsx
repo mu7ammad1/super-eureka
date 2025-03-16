@@ -278,7 +278,7 @@ export default function NewScreen() {
                 </p>
               )}
               <Textarea
-                placeholder="Tell us what you want to imagine today?"
+                placeholder="prompt"
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 className="border-0 block w-full resize-none shadow-none focus-visible:ring-offset-0 focus-visible:ring-0 md:text-lg tracking-normal bg-transparent placeholder:text-primary/40"
