@@ -137,6 +137,11 @@ export default function NewScreen() {
     },
   ];
 
+
+
+
+
+
   const randomizePrompt = () => {
     const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
     const randomPrompt = randomStatus.label[Math.floor(Math.random() * randomStatus.label.length)];
@@ -154,7 +159,7 @@ export default function NewScreen() {
     setLoading(true);
     setError(null);
 
-    const numberOfImages = 4; // يمكنك زيادة العدد إذا أردت
+    const numberOfImages = 4; // تم تقليله إلى 1 للاختبار، يمكنك زيادته لاحقًا
 
     const imagePromises = Array.from({ length: numberOfImages }, async () => {
       try {
@@ -167,50 +172,28 @@ export default function NewScreen() {
             prompt,
             style: selectedStatus?.Style.toLowerCase() || "realistic",
             aspect_ratio: "1:1",
-            seed: Math.random().toString().split(".")[1], // مولد seed عشوائي
+            seed: Math.random().toString().split(".")[1],
           }),
         });
 
         if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || "Failed to generate image");
-        }
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          if (errorData.code === 1101) {
-            throw new Error("Not enough tokens to generate images. Please recharge your imagen Fly account.");
+          let errorMessage;
+          try {
+            const errorData = await response.json();
+            if (errorData.code === 1101) {
+              errorMessage = "Not enough tokens to generate images. Please recharge your vyro.ai account.";
+            } else {
+              errorMessage = errorData.error || "Failed to generate image";
+            }
+          } catch {
+            errorMessage = await response.text(); // إذا لم يكن JSON، استخدم النص الخام
           }
-          throw new Error(errorData.error || "Failed to generate image");
+          throw new Error(errorMessage);
         }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        const blob = await response.blob(); // الحصول على الصورة كـ Blob
+        const blob = await response.blob();
         const fileName = `imagenFly-${Math.random()}`;
 
-        // رفع الصورة إلى Supabase
         const { error: uploadError } = await supabase.storage
           .from("imagenfly")
           .upload(fileName, blob, { contentType: "image/png" });
@@ -230,18 +213,9 @@ export default function NewScreen() {
     try {
       const results = await Promise.all(imagePromises);
 
-
-
-
-
-
-
-
-
-
       const photosData = results.map((result) => ({
         url: result.url,
-        promp: prompt,
+        prompt, // تصحيح "promp" إلى "prompt"
         style: selectedStatus?.Style || "realistic",
       }));
 
@@ -249,7 +223,6 @@ export default function NewScreen() {
         .from("photos")
         .insert(photosData)
         .select();
-
 
       if (insertError) {
         setError("Failed to save photos data: " + insertError.message);
@@ -278,7 +251,7 @@ export default function NewScreen() {
                 </p>
               )}
               <Textarea
-                placeholder="prompt"
+                placeholder="Tell us what you want to imagine today?"
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 className="border-0 block w-full resize-none shadow-none focus-visible:ring-offset-0 focus-visible:ring-0 md:text-lg tracking-normal bg-transparent placeholder:text-primary/40"
@@ -364,11 +337,6 @@ export default function NewScreen() {
     </main>
   );
 }
-
-
-
-
-
 
 
 

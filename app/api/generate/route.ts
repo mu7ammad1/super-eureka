@@ -1,4 +1,3 @@
-// app/api/generate/route.ts
 export const runtime = "edge";
 
 interface PostRequestBody {
