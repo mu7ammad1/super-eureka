@@ -21,7 +21,7 @@ export default function Nav() {
                         <Link href='/generate'>Generate</Link>
                     </Button>
                     <Button variant='ghost' size='sm' className='rounded-full hover:bg-primary hover:text-primary-foreground'>
-                        <Link href='/explore'>Explore</Link>
+                        <Link href='/inspiration'>Inspiration</Link>
                     </Button>
                     <Button variant='ghost' size='sm' className='rounded-full hover:bg-primary hover:text-primary-foreground'>
                         <Link href='/pricing'>Pricing</Link>

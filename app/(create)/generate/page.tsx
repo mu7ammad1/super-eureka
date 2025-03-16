@@ -5,9 +5,18 @@ import { ArrowRightIcon, DicesIcon, Settings2Icon } from "lucide-react";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { DialogTitle } from "@/components/ui/dialog";
 import { createClient } from "@/utils/supabase/client";
 import PinterestGrid from "@/components/PinterestGrid";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { cn } from "@/lib/utils"
+
 
 type Status = {
   Style: string;
@@ -192,7 +201,7 @@ export default function NewScreen() {
         }
 
         const blob = await response.blob();
-        const fileName = `imagenFly-${Math.random()}`;
+        const fileName = `imagenFly-${Math.random().toString(36).substring(2)}`;
 
         const { error: uploadError } = await supabase.storage
           .from("imagenfly")
@@ -242,7 +251,7 @@ export default function NewScreen() {
         <section className="w-full flex flex-col justify-center gap-4 mb-40">
           <PinterestGrid imageUrls={imageUrls} />
         </section>
-        <section className="fixed left-0 right-0 bottom-5 z-50 flex justify-center items-center">
+        <section className="fixed left-2 right-2 bottom-5 z-50 flex justify-center items-center">
           <section className="flex flex-col w-full max-w-3xl items-center border p-2 rounded-3xl bg-neutral-100 placeholder:text-black dark:bg-secondary border-none box">
             <form onSubmit={handleSubmit} className="w-full">
               {error && (
@@ -258,20 +267,33 @@ export default function NewScreen() {
                 disabled={loading}
               />
               <div className="flex items-center w-full justify-between">
-                <div className="flex items-center gap-2 justify-between *:bg-primary-foreground">
+                <div className="flex items-center gap-2 justify-between ">
+                  <Dialog>
+                    <DialogTrigger className="rounded-full">
+                      <Button
+                        type="button"
+                        variant={"default"}
+                        size={"icon"}
+                        className="rounded-full"
+                        disabled={loading}
+                      >
+                        <Settings2Icon className="h-4 w-4" />
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="h-96">
+                      <DialogHeader>
+                        <DialogTitle className={cn("flex flex-col items-center justify-center h-full space-y-4 w-full")}>Are you absolutely sure?</DialogTitle>
+                        <DialogDescription>
+                          This action cannot be undone. This will permanently delete your account
+                          and remove your data from our servers.
+                        </DialogDescription>
+                      </DialogHeader>
+                    </DialogContent>
+                  </Dialog>
+
                   <Button
                     type="button"
-                    variant={"secondary"}
-                    size={"icon"}
-                    className="rounded-full"
-                    onClick={randomizePrompt}
-                    disabled={loading}
-                  >
-                    <Settings2Icon className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    type="button"
-                    variant={"secondary"}
+                    variant={"default"}
                     size={"icon"}
                     className="rounded-full"
                     onClick={randomizePrompt}
@@ -282,7 +304,7 @@ export default function NewScreen() {
                   <Drawer open={open} onOpenChange={setOpen}>
                     <DrawerTrigger asChild>
                       <Button
-                        variant="outline"
+                        variant="default"
                         size={"default"}
                         className="rounded-full justify-start"
                         disabled={loading}
