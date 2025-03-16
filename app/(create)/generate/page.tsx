@@ -23,9 +23,10 @@ export default function NewScreen() {
   const [prompt, setPrompt] = useState("");
   const [open, setOpen] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<Status | null>(null);
-  const [imageUrls, setImageUrls] = useState<string[]>([]); // تغيير القيمة الافتراضية إلى مصفوفة فارغة
+  const [imageUrls, setImageUrls] = useState<string[]>([]); // Set the default value to an empty array
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
 
   const statuses: Status[] = [
     {
@@ -36,6 +37,60 @@ export default function NewScreen() {
         "A bustling street market, vibrant colors of fruits and vegetables, people selling goods.",
         "A small boat in the middle of a calm lake, mountain reflections on the water, white clouds.",
         "A modern city street at night, glowing car lights and skyscrapers, lively atmosphere.",
+        "A superhero flying over a colorful city, bright tones, exaggerated building shapes.",
+        "A family of cute cats living in a treehouse, cheerful details, blue sky with fluffy clouds.",
+        "An adventurer in a cartoonish jungle, quirky colored trees, funny animals peeking out.",
+        "A magical school full of students, flying books, vibrant and playful colors.",
+        "A car race on a colorful track, exaggerated car designs, cheering crowd.",
+        "An abandoned factory, rusty machinery, high contrast, gloomy atmosphere.",
+        "A city under rain, people with umbrellas, reflections on wet streets.",
+        "A lone tree in a desert, long shadows, dark sky looming.",
+        "An old maritime scene, a sailing ship in a storm, towering waves.",
+        "A haunted old house, broken windows, fog surrounding it.",
+        "A futuristic cityscape, neon lights, flying cars, dark sky.",
+        "A medieval castle on a hill, knights in armor, banners waving.",
+        "A group of friends on a road trip, colorful car, sunny day, happy faces.",
+        "An apple orchard in spring, warm colors, soft brushstrokes blending together.",
+        "A village by a riverbank, cloudy sky, water reflections in rich hues.",
+        "A historical warrior on horseback, shiny armor, dense forest background.",
+        "A woman sitting by a window, sunlight on her face, detailed and vivid textures.",
+        "An old harbor filled with ships, blue and orange tones, calm serene mood.",
+        "An alien planet with three suns, glowing plants, strange creatures moving in the background.",
+        "A spaceship landing on a dusty moon, swirling dust, neon lights glowing.",
+        "A giant robot in an abandoned city, red sky, glowing rubble scattered around.",
+        "A floating space station among stars, twinkling lights, windows overlooking the galaxy.",
+        "A space battle between ships, colorful explosions, planets in the distance.",
+        "A fantasy world with floating islands, waterfalls, and lush greenery.",
+        "A dragon flying over a medieval town, fire-breathing, dark clouds in the sky.",
+        "A serene beach at sunset, waves gently crashing, warm golden light.",
+        "A futuristic robot city, neon lights, advanced technology everywhere.",
+        "A cozy cabin in the woods, snow falling, smoke coming from the chimney.",
+        "A bustling futuristic market, aliens and humans trading goods, vibrant colors.",
+        "A peaceful countryside, rolling hills, a small cottage with a garden.",
+        "A majestic waterfall in a dense forest, mist rising, sunlight filtering through the trees.",
+        "A space station orbiting a distant planet, astronauts floating outside, stars in the background.",
+        "A mystical forest with glowing plants, magical creatures, and a hidden path.",
+        "A grand library with towering bookshelves, ancient books, and a cozy reading nook.",
+        "A vibrant coral reef, colorful fish swimming, sunlight piercing through the water.",
+        "A serene mountain lake, crystal clear water, reflections of the surrounding peaks.",
+        "A bustling medieval marketplace, merchants selling goods, lively atmosphere.",
+        "A futuristic cityscape with flying cars, towering skyscrapers, and advanced technology.",
+        "A tranquil Japanese garden, cherry blossoms in full bloom, a peaceful pond with koi fish.",
+        "A magical castle floating in the sky, surrounded by clouds and rainbows.",
+        "A dense jungle with exotic animals, vibrant flowers, and a hidden temple.",
+        "A serene beach with turquoise waters, palm trees swaying, and a hammock between them.",
+        "A bustling city street at night, neon signs, people walking, and cars passing by.",
+        "A peaceful countryside with rolling hills, a small village, and a river flowing through.",
+      ],
+    },
+    {
+      Style: "anime",
+      label: [
+        "A superhero flying over a colorful city, bright tones, exaggerated building shapes.",
+        "A family of cute cats living in a treehouse, cheerful details, blue sky with fluffy clouds.",
+        "An adventurer in a cartoonish jungle, quirky colored trees, funny animals peeking out.",
+        "A magical school full of students, flying books, vibrant and playful colors.",
+        "A car race on a colorful track, exaggerated car designs, cheering crowd.",
       ],
     },
     {
@@ -61,29 +116,37 @@ export default function NewScreen() {
     {
       Style: "flux-schnell",
       label: [
-        "An alien planet with three suns, glowing plants, strange creatures moving in the background.",
-        "A spaceship landing on a dusty moon, swirling dust, neon lights glowing.",
-        "A giant robot in an abandoned city, red sky, glowing rubble scattered around.",
-        "A floating space station among stars, twinkling lights, windows overlooking the galaxy.",
-        "A space battle between ships, colorful explosions, planets in the distance.",
-      ],
-    },
-    {
-      Style: "anime",
-      label: [
         "A superhero flying over a colorful city, bright tones, exaggerated building shapes.",
         "A family of cute cats living in a treehouse, cheerful details, blue sky with fluffy clouds.",
         "An adventurer in a cartoonish jungle, quirky colored trees, funny animals peeking out.",
         "A magical school full of students, flying books, vibrant and playful colors.",
         "A car race on a colorful track, exaggerated car designs, cheering crowd.",
+        "A dragon flying over a medieval town, fire-breathing, dark clouds in the sky.",
+        "A cozy cabin in the woods, snow falling, smoke coming from the chimney.",
+        "A bustling futuristic market, aliens and humans trading goods, vibrant colors.",
+        "A peaceful countryside, rolling hills, a small cottage with a garden.",
+        "A majestic waterfall in a dense forest, mist rising, sunlight filtering through the trees.",
+        "A space station orbiting a distant planet, astronauts floating outside, stars in the background.",
+        "A mystical forest with glowing plants, magical creatures, and a hidden path.",
+        "A grand library with towering bookshelves, ancient books, and a cozy reading nook.",
+        "A vibrant coral reef, colorful fish swimming, sunlight piercing through the water.",
+        "A serene mountain lake, crystal clear water, reflections of the surrounding peaks.",
+        "A bustling medieval marketplace, merchants selling goods, lively atmosphere.",
+        "A futuristic cityscape with flying cars, towering skyscrapers, and advanced technology.",
+        "A tranquil Japanese garden, cherry blossoms in full bloom, a peaceful pond with koi fish.",
+        "A magical castle floating in the sky, surrounded by clouds and rainbows.",
+        "A dense jungle with exotic animals, vibrant flowers, and a hidden temple.",
+        "A serene beach with turquoise waters, palm trees swaying, and a hammock between them.",
+        "A bustling city street at night, neon signs, people walking, and cars passing by.",
+        "A peaceful countryside with rolling hills, a small village, and a river flowing through.",
       ],
     },
   ];
 
+
   const randomizePrompt = () => {
     const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
-    const randomPrompt =
-      randomStatus.label[Math.floor(Math.random() * randomStatus.label.length)];
+    const randomPrompt = randomStatus.label[Math.floor(Math.random() * randomStatus.label.length)];
     setPrompt(randomPrompt);
   };
 
@@ -94,21 +157,14 @@ export default function NewScreen() {
       return;
     }
 
-    const numberOfImages = 4; // يمكنك زيادة العدد إذا أردت
     const supabase = createClient();
-
     setLoading(true);
-    setError(null);
-
-    // لا نعين imageUrls إلى null، بل نحتفظ بالقيم الحالية
+    const numberOfImages = 1;
 
     const imagePromises = Array.from({ length: numberOfImages }, async () => {
       const formData = new FormData();
       formData.append("prompt", prompt);
-      formData.append(
-        "style",
-        selectedStatus?.Style.toLowerCase() || "realistic"
-      );
+      formData.append("style", selectedStatus?.Style.toLowerCase() || "realistic");
       formData.append("aspect_ratio", "1:1");
       formData.append("seed", `${Math.random().toString().split(".")[1]}`);
 
@@ -116,11 +172,7 @@ export default function NewScreen() {
 
       if (result.success && result.imageBase64) {
         const byteCharacters = atob(result.imageBase64);
-        const byteNumbers = new Array(byteCharacters.length);
-        for (let i = 0; i < byteCharacters.length; i++) {
-          byteNumbers[i] = byteCharacters.charCodeAt(i);
-        }
-        const byteArray = new Uint8Array(byteNumbers);
+        const byteArray = new Uint8Array(/* ... */);
         const blob = new Blob([byteArray], { type: "image/png" });
 
         const fileName = `imagenFly-${Math.random()}`;
@@ -134,10 +186,7 @@ export default function NewScreen() {
           .from("imagenfly")
           .getPublicUrl(fileName);
 
-        return {
-          url: publicUrlData?.publicUrl || "",
-          fileName,
-        };
+        return { url: publicUrlData?.publicUrl || "", fileName };
       } else {
         throw new Error(result.error || "Unknown error");
       }
@@ -145,10 +194,10 @@ export default function NewScreen() {
 
     try {
       const results = await Promise.all(imagePromises);
-      const newUrls = results.map((result) => result.url).filter((url) => url && url.startsWith("http")); // تصفية الروابط غير الصالحة
+      const newUrls = results.map((result) => result.url).filter((url) => url && url.startsWith("http"));
       const photosData = results.map((result) => ({
         url: result.url,
-        promp: prompt,
+        prompt: prompt,
         style: selectedStatus?.Style || "realistic",
       }));
 
@@ -160,8 +209,7 @@ export default function NewScreen() {
       if (insertError) {
         setError("Failed to save photos data: " + insertError.message);
       } else {
-        console.log("Photos saved successfully:", Photos);
-        setImageUrls((prevUrls) => [...(prevUrls || []), ...newUrls]); // إضافة الروابط الجديدة إلى القائمة الحالية
+        setImageUrls((prevUrls) => [...prevUrls, ...newUrls]);
       }
     } catch (err) {
       if (err instanceof Error) {
@@ -173,7 +221,6 @@ export default function NewScreen() {
 
     setLoading(false);
   };
-
   return (
     <main className="w-full flex justify-center relative">
       <main className="flex flex-col justify-center items-center max-w-5xl">
