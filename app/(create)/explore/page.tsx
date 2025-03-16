@@ -8,9 +8,9 @@ import GenerativeFillComponent from "@/app/actions/GenerativeFill";
 export default function ExpoloreScreen() {
   return (
     <div className="flex flex-col items-center justify-center h-full space-y-4 w-full">
+      <TextToImageComponent />
       <UploadImage />
       <BackgroundRemoverComponent />
-      <TextToImageComponent />
       <AIResizeComponent />
       <RemoveElementComponent />
       <GenerativeFillComponent />

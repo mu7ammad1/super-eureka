@@ -1,7 +1,7 @@
+// components/TextToImageComponent.tsx (أو أي ملف آخر)
 "use client";
 
 import { useState } from "react";
-import { TextToImage } from "./imagine";
 
 export default function TextToImageComponent() {
   const [prompt, setPrompt] = useState<string>("");
@@ -15,38 +15,41 @@ export default function TextToImageComponent() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!prompt) {
-      setError("Please enter a prompt");
+      setError("Prompt is required");
       return;
     }
-
-    const formData = new FormData();
-    formData.append("prompt", prompt);
-    formData.append("style", style);
-    formData.append("aspect_ratio", aspectRatio);
-    formData.append("seed", seed);
 
     setLoading(true);
     setError(null);
     setImageUrl(null);
 
-    const result = await TextToImage(formData);
+    try {
+      const response = await fetch("/api/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          prompt,
+          style,
+          aspect_ratio: aspectRatio,
+          seed,
+        }),
+      });
 
-    if (result.success && result.imageBase64) {
-      const byteCharacters = atob(result.imageBase64);
-      const byteNumbers = new Array(byteCharacters.length);
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to generate image");
       }
-      const byteArray = new Uint8Array(byteNumbers);
-      const blob = new Blob([byteArray], { type: "image/png" });
-      const url = URL.createObjectURL(blob);
-      setImageUrl(url);
-      console.log("Image generated successfully");
-    } else {
-      setError(result.error || "Unknown error occurred");
-    }
 
-    setLoading(false);
+      const blob = await response.blob(); // تحويل البيانات الثنائية إلى Blob
+      const url = URL.createObjectURL(blob); // إنشاء URL مؤقت للصورة
+      setImageUrl(url);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An unknown error occurred");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -69,14 +72,18 @@ export default function TextToImageComponent() {
             <option value="anime">Anime</option>
             <option value="flux-schnell">Flux-schnell</option>
             <option value="flux-dev">Flux-dev</option>
-            <option value="flux-dev-fast">flux-dev-fast</option>
-            <option value="sdxl-1.0">sdxl-1.0</option>
-            <option value="imagine-turbo">imagine-turbo</option>
+            <option value="flux-dev-fast">Flux-dev-fast</option>
+            <option value="sdxl-1.0">SDXL-1.0</option>
+            <option value="imagine-turbo">Imagine-turbo</option>
           </select>
         </div>
         <div>
           <label>Aspect Ratio:</label>
-          <select value={aspectRatio} onChange={(e) => setAspectRatio(e.target.value)} disabled={loading}>
+          <select
+            value={aspectRatio}
+            onChange={(e) => setAspectRatio(e.target.value)}
+            disabled={loading}
+          >
             <option value="1:1">1:1</option>
             <option value="3:2">3:2</option>
             <option value="4:3">4:3</option>
