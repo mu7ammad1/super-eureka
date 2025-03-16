@@ -2,12 +2,7 @@
 
 import React, { useState } from "react";
 import { ArrowRightIcon, DicesIcon, Settings2Icon } from "lucide-react";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
-import { TextToImage } from "@/app/actions/imagine";
+import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { DialogTitle } from "@/components/ui/dialog";
@@ -23,10 +18,9 @@ export default function NewScreen() {
   const [prompt, setPrompt] = useState("");
   const [open, setOpen] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<Status | null>(null);
-  const [imageUrls, setImageUrls] = useState<string[]>([]); // Set the default value to an empty array
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-
 
   const statuses: Status[] = [
     {
@@ -143,7 +137,6 @@ export default function NewScreen() {
     },
   ];
 
-
   const randomizePrompt = () => {
     const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
     const randomPrompt = randomStatus.label[Math.floor(Math.random() * randomStatus.label.length)];
@@ -159,23 +152,65 @@ export default function NewScreen() {
 
     const supabase = createClient();
     setLoading(true);
-    const numberOfImages = 1;
+    setError(null);
+
+    const numberOfImages = 4; // يمكنك زيادة العدد إذا أردت
 
     const imagePromises = Array.from({ length: numberOfImages }, async () => {
-      const formData = new FormData();
-      formData.append("prompt", prompt);
-      formData.append("style", selectedStatus?.Style.toLowerCase() || "realistic");
-      formData.append("aspect_ratio", "1:1");
-      formData.append("seed", `${Math.random().toString().split(".")[1]}`);
+      try {
+        const response = await fetch("/api/generate", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            prompt,
+            style: selectedStatus?.Style.toLowerCase() || "realistic",
+            aspect_ratio: "1:1",
+            seed: Math.random().toString().split(".")[1], // مولد seed عشوائي
+          }),
+        });
 
-      const result = await TextToImage(formData);
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || "Failed to generate image");
+        }
 
-      if (result.success && result.imageBase64) {
-        const byteCharacters = atob(result.imageBase64);
-        const byteArray = new Uint8Array(/* ... */);
-        const blob = new Blob([byteArray], { type: "image/png" });
+        if (!response.ok) {
+          const errorData = await response.json();
+          if (errorData.code === 1101) {
+            throw new Error("Not enough tokens to generate images. Please recharge your imagen Fly account.");
+          }
+          throw new Error(errorData.error || "Failed to generate image");
+        }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        const blob = await response.blob(); // الحصول على الصورة كـ Blob
         const fileName = `imagenFly-${Math.random()}`;
+
+        // رفع الصورة إلى Supabase
         const { error: uploadError } = await supabase.storage
           .from("imagenfly")
           .upload(fileName, blob, { contentType: "image/png" });
@@ -187,17 +222,26 @@ export default function NewScreen() {
           .getPublicUrl(fileName);
 
         return { url: publicUrlData?.publicUrl || "", fileName };
-      } else {
-        throw new Error(result.error || "Unknown error");
+      } catch (err) {
+        throw err instanceof Error ? err : new Error("Unknown error");
       }
     });
 
     try {
       const results = await Promise.all(imagePromises);
-      const newUrls = results.map((result) => result.url).filter((url) => url && url.startsWith("http"));
+
+
+
+
+
+
+
+
+
+
       const photosData = results.map((result) => ({
         url: result.url,
-        prompt: prompt,
+        promp: prompt,
         style: selectedStatus?.Style || "realistic",
       }));
 
@@ -206,21 +250,19 @@ export default function NewScreen() {
         .insert(photosData)
         .select();
 
+
       if (insertError) {
         setError("Failed to save photos data: " + insertError.message);
       } else {
-        setImageUrls((prevUrls) => [...prevUrls, ...newUrls]);
+        setImageUrls((prevUrls) => [...prevUrls, ...results.map((result) => result.url)]);
       }
     } catch (err) {
-      if (err instanceof Error) {
-        setError(`Error generating images: ${err.message}`);
-      } else {
-        setError("Error generating images: Unknown error");
-      }
+      setError(`Error generating images: ${err instanceof Error ? err.message : "Unknown error"}`);
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
+
   return (
     <main className="w-full flex justify-center relative">
       <main className="flex flex-col justify-center items-center max-w-5xl">
@@ -272,11 +314,7 @@ export default function NewScreen() {
                         className="rounded-full justify-start"
                         disabled={loading}
                       >
-                        {selectedStatus ? (
-                          <>{selectedStatus.Style}</>
-                        ) : (
-                          <>Default Style</>
-                        )}
+                        {selectedStatus ? <>{selectedStatus.Style}</> : <>Default Style</>}
                       </Button>
                     </DrawerTrigger>
                     <DrawerContent>
@@ -292,9 +330,7 @@ export default function NewScreen() {
                                   onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                                     const value = (e.target as HTMLButtonElement).value;
                                     setSelectedStatus(
-                                      statuses.find(
-                                        (priority) => priority.Style === value
-                                      ) || null
+                                      statuses.find((priority) => priority.Style === value) || null
                                     );
                                     setOpen(false);
                                   }}
@@ -318,11 +354,7 @@ export default function NewScreen() {
                   className="rounded-full w-auto h-auto p-2"
                   disabled={loading}
                 >
-                  {loading ? (
-                    "Generating..."
-                  ) : (
-                    <ArrowRightIcon className="h-5 w-5" />
-                  )}
+                  {loading ? "Generating..." : <ArrowRightIcon className="h-5 w-5" />}
                 </Button>
               </div>
             </form>
@@ -332,3 +364,12 @@ export default function NewScreen() {
     </main>
   );
 }
+
+
+
+
+
+
+
+
+

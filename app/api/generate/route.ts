@@ -20,7 +20,7 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   const myHeaders = new Headers();
-  myHeaders.append("Authorization", "Bearer vk-31cdjDBOkkhIgaoF2Mf3cXgNXCfXImejp1e2DqWfJ7IAh");
+  myHeaders.append("Authorization", "Bearer vk-6vADBMcYstO23VqWg3DfmdtciM3SstDef18o73pNDmSXCj");
 
   const formdata = new FormData();
   formdata.append("prompt", prompt);
