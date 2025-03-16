@@ -9,13 +9,17 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "Imagen Fly: Let Your Imagination Fly",
+  title:{
+    template: '%s | Imagen Fly',
+    default: 'Imagen Fly: Let Your Imagination Fly', // a default is required when creating a template
+  },
+  referrer: 'origin-when-cross-origin',
   description: "Create stunning images with Imagen Fly, the fastest AI image generator tool.",
-  keywords: "AI image generator, creative AI, image creation tool",
+  keywords: ['AI image generator', 'creative AI', 'image creation tool'],
   openGraph: {
     title: "Imagen Fly: Let Your Imagination Fly",
     description: "Unleash your creativity with AI-powered image generation.",
-    images: ["/thumbnail.jpg"], // صورة افتراضية للمشاركة
+    images: ["/thumbnail.jpg"]
   },
 };
 
