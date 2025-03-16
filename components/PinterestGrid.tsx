@@ -68,7 +68,7 @@ export default function PinterestGrid({ imageUrls }: { imageUrls: string[] | nul
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <div className="w-full flex *:w-1/4 flex-wrap">
+    <div className="w-full flex flex-wrap *:w-1/4 *:max-sm:w-1/2 *:max-md:w-1/3">
       {images.length === 0 && <div>No images found</div>}
       {imageUrls && imageUrls.map((imageUrl, index) => (
         <div
