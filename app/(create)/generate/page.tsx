@@ -12,19 +12,18 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { DialogTitle } from "@/components/ui/dialog";
 import { createClient } from "@/utils/supabase/client";
+import PinterestGrid from "@/components/PinterestGrid";
 
 type Status = {
   Style: string;
   label: string[];
 };
 
-import PinterestGrid from "@/components/PinterestGrid";
-
 export default function NewScreen() {
   const [prompt, setPrompt] = useState("");
   const [open, setOpen] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<Status | null>(null);
-  const [imageUrls, setImageUrls] = useState<string[]>([]); // تغيير إلى مصفوفة
+  const [imageUrls, setImageUrls] = useState<string[]>([]); // تغيير القيمة الافتراضية إلى مصفوفة فارغة
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -37,16 +36,6 @@ export default function NewScreen() {
         "A bustling street market, vibrant colors of fruits and vegetables, people selling goods.",
         "A small boat in the middle of a calm lake, mountain reflections on the water, white clouds.",
         "A modern city street at night, glowing car lights and skyscrapers, lively atmosphere.",
-      ],
-    },
-    {
-      Style: "anime",
-      label: [
-        "A superhero flying over a colorful city, bright tones, exaggerated building shapes.",
-        "A family of cute cats living in a treehouse, cheerful details, blue sky with fluffy clouds.",
-        "An adventurer in a cartoonish jungle, quirky colored trees, funny animals peeking out.",
-        "A magical school full of students, flying books, vibrant and playful colors.",
-        "A car race on a colorful track, exaggerated car designs, cheering crowd.",
       ],
     },
     {
@@ -79,6 +68,16 @@ export default function NewScreen() {
         "A space battle between ships, colorful explosions, planets in the distance.",
       ],
     },
+    {
+      Style: "anime",
+      label: [
+        "A superhero flying over a colorful city, bright tones, exaggerated building shapes.",
+        "A family of cute cats living in a treehouse, cheerful details, blue sky with fluffy clouds.",
+        "An adventurer in a cartoonish jungle, quirky colored trees, funny animals peeking out.",
+        "A magical school full of students, flying books, vibrant and playful colors.",
+        "A car race on a colorful track, exaggerated car designs, cheering crowd.",
+      ],
+    },
   ];
 
   const randomizePrompt = () => {
@@ -95,70 +94,81 @@ export default function NewScreen() {
       return;
     }
 
-    const formData = new FormData();
-    formData.append("prompt", prompt);
-    formData.append(
-      "style",
-      selectedStatus?.Style.toLowerCase() || "realistic"
-    );
-    formData.append("aspect_ratio", "1:1");
-    formData.append("seed", `${Math.random().toString().split(".")[1]}`);
+    const numberOfImages = 4; // يمكنك زيادة العدد إذا أردت
+    const supabase = createClient();
 
     setLoading(true);
     setError(null);
 
-    const result = await TextToImage(formData);
+    // لا نعين imageUrls إلى null، بل نحتفظ بالقيم الحالية
 
-    if (result.success && result.imageBase64) {
-      const byteCharacters = atob(result.imageBase64);
-      const byteNumbers = new Array(byteCharacters.length);
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-      }
-      const byteArray = new Uint8Array(byteNumbers);
-      const blob = new Blob([byteArray], { type: "image/png" });
+    const imagePromises = Array.from({ length: numberOfImages }, async () => {
+      const formData = new FormData();
+      formData.append("prompt", prompt);
+      formData.append(
+        "style",
+        selectedStatus?.Style.toLowerCase() || "realistic"
+      );
+      formData.append("aspect_ratio", "1:1");
+      formData.append("seed", `${Math.random().toString().split(".")[1]}`);
 
-      const supabase = createClient();
+      const result = await TextToImage(formData);
 
-      const fileName = `imagenFly-${Math.random()
-        .toString()
-        .split(".")[1]}`;
-      const { data, error: uploadError } = await supabase.storage
-        .from("imagenfly")
-        .upload(fileName, blob, {
-          contentType: "image/png",
-        });
+      if (result.success && result.imageBase64) {
+        const byteCharacters = atob(result.imageBase64);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: "image/png" });
 
-      if (uploadError) {
-        setError("Failed to upload image to Supabase: " + uploadError.message);
-        setLoading(false);
-        return;
-      }
+        const fileName = `imagenFly-${Math.random()}`;
+        const { error: uploadError } = await supabase.storage
+          .from("imagenfly")
+          .upload(fileName, blob, { contentType: "image/png" });
 
-      const { data: publicUrlData } = supabase.storage
-        .from("imagenfly")
-        .getPublicUrl(fileName);
+        if (uploadError) throw new Error(uploadError.message);
 
-      if (publicUrlData?.publicUrl) {
-        setImageUrls((prev) => [...prev, publicUrlData.publicUrl]); // إضافة الرابط الجديد إلى المصفوفة
-        console.log("Image uploaded and generated successfully");
+        const { data: publicUrlData } = supabase.storage
+          .from("imagenfly")
+          .getPublicUrl(fileName);
+
+        return {
+          url: publicUrlData?.publicUrl || "",
+          fileName,
+        };
       } else {
-        setError("Failed to retrieve public URL");
+        throw new Error(result.error || "Unknown error");
       }
+    });
 
-      const { data: Photos, error } = await supabase
+    try {
+      const results = await Promise.all(imagePromises);
+      const newUrls = results.map((result) => result.url).filter((url) => url && url.startsWith("http")); // تصفية الروابط غير الصالحة
+      const photosData = results.map((result) => ({
+        url: result.url,
+        promp: prompt,
+        style: selectedStatus?.Style || "realistic",
+      }));
+
+      const { data: Photos, error: insertError } = await supabase
         .from("photos")
-        .insert([
-          {
-            url: publicUrlData?.publicUrl || "fileName",
-            promp: `${prompt}`,
-            style: `${selectedStatus?.Style || "realistic"}`,
-          },
-        ])
+        .insert(photosData)
         .select();
-      console.log(Photos);
-    } else {
-      setError(result.error || "Unknown error occurred");
+
+      if (insertError) {
+        setError("Failed to save photos data: " + insertError.message);
+      } else {
+        console.log("Photos saved successfully:", Photos);
+        setImageUrls((prevUrls) => [...(prevUrls || []), ...newUrls]); // إضافة الروابط الجديدة إلى القائمة الحالية
+      }
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(`Error generating images: ${err.message}`);
+      } else {
+        setError("Error generating images: Unknown error");
+      }
     }
 
     setLoading(false);
@@ -166,20 +176,22 @@ export default function NewScreen() {
 
   return (
     <main className="w-full flex justify-center relative">
-      <main className="flex flex-col justify-center items-center max-w-4xl">
+      <main className="flex flex-col justify-center items-center max-w-5xl">
         <section className="w-full flex flex-col justify-center gap-4 mb-40">
           <PinterestGrid imageUrls={imageUrls} />
         </section>
-        <section className="fixed left-0 right-0 bottom-3 z-50 flex justify-center items-center px-2">
-          <div>{error && <p className="mt-2" style={{ color: "red" }}>{error}</p>}</div>
+        <section className="fixed left-0 right-0 bottom-0 z-50 flex justify-center items-center">
           <section className="flex flex-col w-full max-w-3xl items-center border p-2 rounded-3xl bg-neutral-100 placeholder:text-black dark:bg-secondary border-none box">
             <form onSubmit={handleSubmit} className="w-full">
+              {error && (
+                <p className="mt-2" style={{ color: "red" }}>
+                  {error}
+                </p>
+              )}
               <Textarea
                 placeholder="Tell us what you want to imagine today?"
                 value={prompt}
-                onChange={(e: {
-                  target: { value: React.SetStateAction<string> };
-                }) => setPrompt(e.target.value)}
+                onChange={(e) => setPrompt(e.target.value)}
                 className="border-0 block w-full resize-none shadow-none focus-visible:ring-offset-0 focus-visible:ring-0 md:text-lg tracking-normal bg-transparent placeholder:text-primary/40"
                 disabled={loading}
               />
@@ -216,7 +228,7 @@ export default function NewScreen() {
                         {selectedStatus ? (
                           <>{selectedStatus.Style}</>
                         ) : (
-                          <>Defualt Style</>
+                          <>Default Style</>
                         )}
                       </Button>
                     </DrawerTrigger>
@@ -231,8 +243,7 @@ export default function NewScreen() {
                                   key={status.Style}
                                   value={status.Style}
                                   onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-                                    const value = (e.target as HTMLButtonElement)
-                                      .value;
+                                    const value = (e.target as HTMLButtonElement).value;
                                     setSelectedStatus(
                                       statuses.find(
                                         (priority) => priority.Style === value
@@ -274,4 +285,3 @@ export default function NewScreen() {
     </main>
   );
 }
-

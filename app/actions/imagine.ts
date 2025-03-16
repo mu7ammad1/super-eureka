@@ -74,28 +74,71 @@ export async function TextToImage(formData: FormData) {
       return { success: false, error: "Please provide a valid prompt" };
     }
 
+    // Optional: Log the prompt for debugging
+    console.log("TextToImage: Sending request with prompt:", prompt);
+
     const response = await axios.post(
       "https://api.vyro.ai/v2/image/generations",
       formData,
       {
         headers: {
           Authorization: "Bearer vk-31cdjDBOkkhIgaoF2Mf3cXgNXCfXImejp1e2DqWfJ7IAh",
+          "Content-Type": "multipart/form-data", // Explicitly set for clarity
         },
-        responseType: "arraybuffer", // استقبال البيانات كـ ArrayBuffer
+        responseType: "arraybuffer",
+        timeout: 60000, // Set a 30-second timeout for axios (adjust as needed)
       }
     );
 
-    // تحويل ArrayBuffer إلى Buffer ثم إلى Base64
+    // Check if the response is valid
+    if (!response.data || response.data.byteLength === 0) {
+      throw new Error("Empty response received from API");
+    }
+
+    // Convert ArrayBuffer to Base64
     const buffer = Buffer.from(response.data);
     const base64Image = buffer.toString("base64");
 
+    console.log("TextToImage: Image generated successfully, size:", buffer.length);
+
     return { success: true, imageBase64: base64Image };
   } catch (err: any) {
-    const errorMessage = err.response?.data?.message || "Error generating image";
-    console.error("Server Error:", err);
+    // Enhanced error logging
+    const status = err.response?.status;
+    let errorMessage = "Error generating image";
+
+    if (err.code === "ECONNABORTED") {
+      errorMessage = "Request timed out. Image generation may take too long.";
+    } else if (err.response) {
+      // Handle API-specific errors
+      errorMessage = err.response.data?.message || `API error: ${status}`;
+      // If the response is not an arraybuffer, try to parse it
+      if (err.response.data instanceof ArrayBuffer) {
+        const text = Buffer.from(err.response.data).toString("utf-8");
+        console.error("API Error Response:", text);
+        errorMessage = text || errorMessage;
+      }
+    } else {
+      errorMessage = err.message || errorMessage;
+    }
+
+    console.error("TextToImage Error:", {
+      message: errorMessage,
+      status,
+      err,
+    });
+
     return { success: false, error: errorMessage };
   }
 }
+
+
+
+
+
+
+
+
 
 
 export async function AIResize(formData: FormData) {
@@ -177,6 +220,13 @@ export async function RemoveElement(formData: FormData) {
     return { success: false, error: errorMessage };
   }
 }
+
+
+
+
+
+
+
 
 
 export async function GenerativeFill(formData: FormData) {

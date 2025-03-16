@@ -10,8 +10,7 @@ interface Photo {
 
 // Move Supabase client creation outside the component
 const supabase = createClient();
-
-export default function PinterestGrid({ imageUrls }: { imageUrls: any[] }) {
+export default function PinterestGrid({ imageUrls }: { imageUrls: string[] | null }) {
   const [imageHeights, setImageHeights] = useState<number[]>([]);
   const [images, setImages] = useState<Photo[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,7 +41,7 @@ export default function PinterestGrid({ imageUrls }: { imageUrls: any[] }) {
     if (!images.length) return;
 
     const heights: number[] = new Array(images.length).fill(0);
-    let loadedImages = 5;
+    let loadedImages = 0;
 
     images.forEach((img, index) => {
       const image = new window.Image();
@@ -68,12 +67,12 @@ export default function PinterestGrid({ imageUrls }: { imageUrls: any[] }) {
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <div className="w-full columns-4 max-sm:columns-2 max-md:columns-2 max-lg:columns-4 gap-4">
+    <div className="w-full flex *:w-1/4 flex-wrap">
       {images.length === 0 && <div>No images found</div>}
       {images.map((image, index) => (
         <div
           key={index}
-          className="mb-4"
+          className="p-2"
         >
           <Image
             src={image.url}
@@ -88,7 +87,7 @@ export default function PinterestGrid({ imageUrls }: { imageUrls: any[] }) {
       {imageUrls && imageUrls.map((imageUrl, index) => (
         <div
           key={index}
-          className="mb-4"
+          className="p-2"
         >
           <Image
             src={imageUrl}
