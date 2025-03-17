@@ -1,5 +1,7 @@
-export default function ToolsScreen() {
+import React from 'react'
+
+export default function Tools() {
   return (
-    <div>privacy-policy</div>
+    <div>Tools</div>
   )
 }

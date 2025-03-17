@@ -226,7 +226,7 @@ export default function HeadSearch() {
                         <Drawer open={open} onOpenChange={setOpen}>
                             <DrawerTrigger asChild>
                                 <Button variant="outline" size={"default"} className="rounded-full justify-start" disabled={loading}>
-                                    {selectedStatus ? <>{selectedStatus.Style}</> : <>+ Set Style</>}
+                                    {selectedStatus ? <>{selectedStatus.Style}</> : <>Defualt Style</>}
                                 </Button>
                             </DrawerTrigger>
                             <DrawerContent>

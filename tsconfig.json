@@ -29,6 +29,6 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "components/SignInWith0AuthButton.tsx"
-  ],
+, "app/(create)/tools/CustomZoomDiv.jsx"  ],
   "exclude": ["node_modules"]
 }

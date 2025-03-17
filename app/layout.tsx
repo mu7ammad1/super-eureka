@@ -3,13 +3,14 @@ import { ThemeProvider } from "next-themes";
 import "./globals.css";
 import Nav from "@/components/nav";
 import { Analytics } from "@vercel/analytics/react"
+
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
   : "http://localhost:3000";
 
 export const metadata = {
   metadataBase: new URL(defaultUrl),
-  title:{
+  title: {
     template: '%s | Imagen Fly',
     default: 'Imagen Fly: Let Your Imagination Fly', // a default is required when creating a template
   },
