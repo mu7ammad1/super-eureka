@@ -185,22 +185,25 @@ export default function NewScreen() {
           }),
         });
 
+        // قراءة جسم الاستجابة مرة واحدة فقط
+        const body = await response.arrayBuffer();
+
         if (!response.ok) {
           let errorMessage;
           try {
-            const errorData = await response.json();
-            if (errorData.code === 1101) {
-              errorMessage = "Not enough tokens to generate images. Please recharge your vyro.ai account.";
-            } else {
-              errorMessage = errorData.error || "Failed to generate image";
-            }
+            const text = new TextDecoder().decode(body);
+            const errorData = JSON.parse(text);
+            errorMessage =
+              errorData.code === 1101
+                ? "Not enough tokens to generate images. Please recharge your vyro.ai account."
+                : errorData.error || "Failed to generate image";
           } catch {
-            errorMessage = await response.text(); // إذا لم يكن JSON، استخدم النص الخام
+            errorMessage = new TextDecoder().decode(body) || "Unknown error";
           }
           throw new Error(errorMessage);
         }
 
-        const blob = await response.blob();
+        const blob = new Blob([body], { type: "image/png" });
         const fileName = `imagenFly-${Math.random().toString(36).substring(2)}`;
 
         const { error: uploadError } = await supabase.storage
