@@ -135,7 +135,7 @@ export default function PinterestGrid({ imageUrls }: { imageUrls: string[] }) {
 
   return (
     <div className="w-full flex flex-col items-center">
-      <div className="w-full flex flex-wrap *:w-1/4 *:max-sm:w-1/2 *:max-md:w-1/3">
+      <div className="w-full flex flex-wrap *:w-1/4 *:max-sm:w-full *:max-md:w-1/3">
         {allImages.map((image, index) => (
           <div key={index} className="p-2">
             <Image
