@@ -3,33 +3,32 @@
 @tailwind utilities;
 
 @keyframes gradient {
-	0% {
-		background-position: 0% 50%;
-	}
-	50% {
-		background-position: 100% 50%;
-	}
-	100% {
-		background-position: 0% 50%;
-	}
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 .gradient {
-	background: linear-gradient(-45deg,
-  #ff5770,
-  #e4428d,
-  #c42da8,
-  #9e16c3,
-  #6501de,
-  #9e16c3,
-  #c42da8,
-  #e4428d,
-  #ff5770);
-	background-size: 400% 400%;
-	animation: gradient 15s ease infinite;
+  background: linear-gradient(
+    -45deg,
+    #ff5770,
+    #e4428d,
+    #c42da8,
+    #9e16c3,
+    #6501de,
+    #9e16c3,
+    #c42da8,
+    #e4428d,
+    #ff5770
+  );
+  background-size: 400% 400%;
+  animation: gradient 15s ease infinite;
 }
-
-
-
 
 @keyframes gradientAnimation {
   0% {
@@ -47,7 +46,6 @@
   background-size: 200% 200%;
   animation: gradientAnimation 3s ease infinite;
 }
-
 
 .box {
   position: relative;
@@ -87,9 +85,6 @@
     background-position: 200% 50%;
   }
 }
-
-
-
 
 @layer base {
   :root {
@@ -173,47 +168,12 @@
   }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-html,
-body {
-  margin: 0;
-  font-family: sans-serif;
+.nodrag {
+  pointer-events: auto;
 }
- 
-#app {
-  width: 100vw;
-  height: 100vh;
-}
- 
-body {
-  margin: 0;
-  background-color: #f8f8f8;
-}
- 
-html,
-body,
-#root {
-  height: 100%;
-}
- 
-.slide {
-  border: 1px solid hsl(333 100% 50%);
-  border-radius: 4px;
-  background-color: white;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+
+.react-flow__handle.connectionindicator {
+  width: 12px;
+  height: 12px;
+  background-color: #ffffff;
 }

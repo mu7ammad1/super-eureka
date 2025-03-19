@@ -168,7 +168,7 @@ export default function NewScreen() {
     setLoading(true);
     setError(null);
 
-    const numberOfImages = 4; // تم تقليله إلى 1 للاختبار، يمكنك زيادته لاحقًا
+    const numberOfImages = 2; // تم تقليله إلى 1 للاختبار، يمكنك زيادته لاحقًا
 
     const imagePromises = Array.from({ length: numberOfImages }, async () => {
       try {
@@ -185,25 +185,22 @@ export default function NewScreen() {
           }),
         });
 
-        // قراءة جسم الاستجابة مرة واحدة فقط
-        const body = await response.arrayBuffer();
-
         if (!response.ok) {
           let errorMessage;
           try {
-            const text = new TextDecoder().decode(body);
-            const errorData = JSON.parse(text);
-            errorMessage =
-              errorData.code === 1101
-                ? "Not enough tokens to generate images. Please recharge your vyro.ai account."
-                : errorData.error || "Failed to generate image";
+            const errorData = await response.json();
+            if (errorData.code === 1101) {
+              errorMessage = "Not enough tokens to generate images. Please recharge your vyro.ai account.";
+            } else {
+              errorMessage = errorData.error || "Failed to generate image";
+            }
           } catch {
-            errorMessage = new TextDecoder().decode(body) || "Unknown error";
+            errorMessage = await response.text(); // إذا لم يكن JSON، استخدم النص الخام
           }
           throw new Error(errorMessage);
         }
 
-        const blob = new Blob([body], { type: "image/png" });
+        const blob = await response.blob();
         const fileName = `imagenFly-${Math.random().toString(36).substring(2)}`;
 
         const { error: uploadError } = await supabase.storage
@@ -272,16 +269,8 @@ export default function NewScreen() {
               <div className="flex items-center w-full justify-between">
                 <div className="flex items-center gap-2 justify-between ">
                   <Dialog>
-                    <DialogTrigger className="rounded-full">
-                      <Button
-                        type="button"
-                        variant={"default"}
-                        size={"icon"}
-                        className="rounded-full"
-                        disabled={loading}
-                      >
-                        <Settings2Icon className="h-4 w-4" />
-                      </Button>
+                    <DialogTrigger className="rounded-full p-2 bg-primary disabled:bg-primary/50" disabled={loading}>
+                        <Settings2Icon className="h-4 w-4 text-primary-foreground" />
                     </DialogTrigger>
                     <DialogContent className="h-96">
                       <DialogHeader>
