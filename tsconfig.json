@@ -29,6 +29,6 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "components/SignInWith0AuthButton.tsx"
-, "app/(create)/tools/CustomZoomDiv.jsx"  ],
+, "app/(create)/tools/CustomZoomDiv.jsx", "app/(create)/ii/initial-elements.jsx", "app/(create)/ii/CircleNode.jsx", "app/(create)/ii/page.jsx", "app/(create)/ii/ToolbarNode.jsx", "app/(create)/ii/TextInputNode.jsx", "app/(create)/ii/ResizerNode.jsx", "app/(create)/ii/ButtonEdge.jsx"  ],
   "exclude": ["node_modules"]
 }

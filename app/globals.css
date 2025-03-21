@@ -172,8 +172,183 @@
   pointer-events: auto;
 }
 
-.react-flow__handle.connectionindicator {
-  width: 12px;
-  height: 12px;
+div.react-flow__handle.react-flow__handle-right.nodrag.nopan.source.connectable.connectablestart.connectableend.connectionindicator {
+  width: 0px !important;
+  height: 0px !important;
+  min-width: 0px !important;
+  min-height: 0px !important;
+  border: 0px solid #5134f1 !important;
+  background-color: #5134f1 !important;
+  content: "" !important;
+}
+
+div.react-flow__handle.react-flow__handle-left.nodrag.nopan.target.connectable.connectablestart.connectableend.connectionindicator {
+  width: 0px !important;
+  height: 0px !important;
+  min-width: 0px !important;
+  min-height: 0px !important;
+  border: 0px solid #f134c2 !important;
+  background-color: #f134c2 !important;
+  content: "" !important;
+}
+
+/* @import url('./xy-theme.css'); */
+
+/* xyflow theme files. Delete these to start from our base */
+
+.react-flow {
+  /* Custom Variables */
+  --xy-theme-selected: #f57dbd;
+  --xy-theme-hover: #ffffff;
+  --xy-theme-edge-hover: black;
+  --xy-theme-color-focus: #5134f1;
+
+  /* Built-in Variables see https://reactflow.dev/learn/customization/theming */
+  --xy-node-border-default: 1px solid #5134f1;
+
+  --xy-node-boxshadow-default:
+    0px 3.54px 4.55px 0px #00000005, 0px 3.54px 4.55px 0px #0000000d,
+    0px 0.51px 1.01px 0px #0000001a;
+
+  --xy-node-border-radius-default: 8px;
+
+  --xy-handle-background-color-default: #ffffff;
+  --xy-handle-border-color-default: #5134f1;
+
+  --xy-edge-label-color-default: #5134f1;
+}
+
+.react-flow.dark {
+  --xy-node-boxshadow-default:
+    0px 3.54px 4.55px 0px #ffffff0d,
+    /* light shadow */ 0px 3.54px 4.55px 0px #da292921,
+    /* medium shadow */ 0px 0.51px 1.01px 0px #df0f0f33; /* smallest shadow */
+  --xy-theme-color-focus: #5134f1;
+}
+
+/* Customizing Default Theming */
+
+.react-flow__node {
+  box-shadow: var(--xy-node-boxshadow-default);
+  border-radius: var(--xy-node-border-radius-default);
+  background-color: var(--xy-node-background-color-default);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 10px;
+  font-size: 12px;
+  flex-direction: column;
+  border: var(--xy-node-border-default);
+  color: var(--xy-node-color, var(--xy-node-color-default));
+}
+
+.react-flow__node.selectable:focus {
+  box-shadow: 0px 0px 0px 4px var(--xy-theme-color-focus);
+  border-color: #5134f1;
+}
+
+.react-flow__node.selectable:focus:active {
+  box-shadow: var(--xy-node-boxshadow-default);
+}
+
+.react-flow__node.selectable:hover,
+.react-flow__node.draggable:hover {
+  border-color: #ffffff;
+  /* border-width: var(--accent); */
+}
+
+.react-flow__node.selectable.selected {
+  border-color: var(--xy-theme-selected);
+  box-shadow: var(--xy-node-boxshadow-default);
+}
+
+.react-flow__node-group {
+  background-color: rgba(207, 182, 255, 0.4);
+  border-color: #9e86ed;
+}
+
+.react-flow__edge.selectable:hover .react-flow__edge-path,
+.react-flow__edge.selectable.selected .react-flow__edge-path {
+  stroke: var(--xy-theme-edge-hover);
+}
+
+.react-flow__handle {
+  background-color: var(--xy-handle-background-color-default);
+}
+
+.react-flow__handle.connectionindicator:hover {
+  pointer-events: all;
+  border-color: var(--xy-theme-edge-hover);
+  background-color: #5134f1;
+}
+
+.react-flow__handle.connectionindicator:focus,
+.react-flow__handle.connectingfrom,
+.react-flow__handle.connectingto {
+  border-color: var(--xy-theme-edge-hover);
+}
+
+.react-flow__node-resizer {
+  border-radius: 0;
+  border: none;
+}
+
+.react-flow__resize-control.handle {
   background-color: #ffffff;
+  border-color: #9e86ed;
+  border-radius: 0;
+  width: 5px;
+  height: 5px;
+}
+
+.react-flow__node-input,
+.react-flow__node-default,
+.react-flow__node-output,
+.react-flow__node-group {
+  color: #5134f1 !important;
+}
+
+html,
+body {
+  margin: 0;
+  font-family: sans-serif;
+  box-sizing: border-box;
+}
+
+#app {
+  width: 100vw;
+  height: 100vh;
+}
+
+.wrapper {
+  flex-grow: 1;
+  height: 100vh !important;
+  width: 100% !important;
+  color: #5134f1;
+}
+.react-flow.touch-flow .react-flow__handle {
+  width: 20px;
+  height: 20px;
+}
+ 
+.touch-flow .react-flow__handle-right {
+  --translate: translate(50%, -50%);
+}
+ 
+.touch-flow .react-flow__handle-left {
+  --translate: translate(-50%, -50%);
+}
+ 
+@keyframes bounce {
+  0% {
+    transform: var(--translate) scale(1);
+  }
+  50% {
+    transform: var(--translate) scale(1.1);
+  }
+}
+ 
+.react-flow.touch-flow .react-flow__handle.clickconnecting {
+  animation: bounce 1600ms infinite ease-in;
 }
