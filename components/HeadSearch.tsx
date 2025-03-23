@@ -10,7 +10,7 @@ import {
     DrawerContent,
     DrawerTrigger,
 } from "@/components/ui/drawer";
-import { DialogTitle } from "./ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
 import { TextToImage } from "@/app/actions/imagine";
 
 type Status = {
@@ -19,6 +19,7 @@ type Status = {
 };
 
 import { usePathname } from 'next/navigation';
+import { cn } from "@/lib/utils";
 
 export default function HeadSearch() {
     const [prompt, setPrompt] = useState("");
@@ -191,87 +192,106 @@ export default function HeadSearch() {
         setLoading(false);
     };
 
+    const randomizePrompt = () => {
+        const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
+        const randomPrompt = randomStatus.label[Math.floor(Math.random() * randomStatus.label.length)];
+        setPrompt(randomPrompt);
+      };
+    
+
     return (
         <div className="flex flex-col w-full max-w-3xl items-center border p-2 rounded-3xl bg-neutral-100 placeholder:text-black dark:bg-secondary border-none box">
             <form onSubmit={handleSubmit} className="w-full">
-                <Textarea
-                    placeholder="Tell us what you want to imagine today?"
-                    value={prompt}
-                    onChange={(e) => setPrompt(e.target.value)}
-                    className="border-0 block w-full resize-none shadow-none focus-visible:ring-offset-0 focus-visible:ring-0 md:text-lg tracking-normal bg-transparent placeholder:text-primary/40"
+              {error && (
+                <p className="mt-2" style={{ color: "red" }}>
+                  {error}
+                </p>
+              )}
+              <Textarea
+                placeholder="Prompt"
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                className="border-0 block w-full resize-none shadow-none focus-visible:ring-offset-0 focus-visible:ring-0 md:text-lg tracking-normal bg-transparent placeholder:text-primary/40"
+                disabled={loading}
+              />
+              <div className="flex items-center w-full justify-between">
+                <div className="flex items-center gap-2 justify-between ">
+                  <Dialog>
+                    <DialogTrigger className="rounded-full p-2 bg-primary disabled:bg-primary/50" disabled={loading}>
+                        <Settings2Icon className="h-4 w-4 text-primary-foreground" />
+                    </DialogTrigger>
+                    <DialogContent className="h-96">
+                      <DialogHeader>
+                        <DialogTitle className={cn("flex flex-col items-center justify-center h-full space-y-4 w-full")}>Are you absolutely sure?</DialogTitle>
+                        <DialogDescription>
+                          This action cannot be undone. This will permanently delete your account
+                          and remove your data from our servers.
+                        </DialogDescription>
+                      </DialogHeader>
+                    </DialogContent>
+                  </Dialog>
+
+                  <Button
+                    type="button"
+                    variant={"default"}
+                    size={"icon"}
+                    className="rounded-full"
+                    onClick={randomizePrompt}
                     disabled={loading}
-                />
-                <div className="flex items-center w-full justify-between">
-                    <div className="flex items-center gap-2 justify-between *:bg-primary-foreground">
-                        <Button
-                            type="button"
-                            variant={"secondary"}
-                            size={"icon"}
-                            className="rounded-full"
-                            onClick={randomizePromptAndStyle}
-                            disabled={loading}
-                        >
-                            <Settings2Icon className="h-4 w-4" />
-                        </Button>
-                        <Button
-                            type="button"
-                            variant={"secondary"}
-                            size={"icon"}
-                            className="rounded-full"
-                            onClick={randomizePromptAndStyle}
-                            disabled={loading}
-                        >
-                            <DicesIcon className="h-4 w-4" />
-                        </Button>
-                        <Drawer open={open} onOpenChange={setOpen}>
-                            <DrawerTrigger asChild>
-                                <Button variant="outline" size={"default"} className="rounded-full justify-start" disabled={loading}>
-                                    {selectedStatus ? <>{selectedStatus.Style}</> : <>Defualt Style</>}
-                                </Button>
-                            </DrawerTrigger>
-                            <DrawerContent>
-                                <DialogTitle className="hidden">Set Style</DialogTitle>
-                                <div className="mt-4 border-t">
-                                    <main>
-                                        <section>
-                                            <section className="flex flex-wrap justify-center items-start gap-5 *:w-[15.666667%] *:max-md:w-[24.5%] *:max-sm:w-[47%] w-full mt-2 max-h-96 scroll- overflow-y-auto">
-                                                {statuses.map((status) => (
-                                                    <Button
-                                                        key={status.Style}
-                                                        value={status.Style}
-                                                        onClick={(e) => {
-                                                            const value = (e.target as HTMLButtonElement).value;
-                                                            setSelectedStatus(
-                                                                statuses.find((priority) => priority.Style === value) || null
-                                                            );
-                                                            setOpen(false);
-                                                        }}
-                                                        className="h-32 w-full"
-                                                        disabled={loading}
-                                                    >
-                                                        {status.Style}
-                                                    </Button>
-                                                ))}
-                                            </section>
-                                        </section>
-                                    </main>
-                                </div>
-                            </DrawerContent>
-                        </Drawer>
-                        <Button type="button" variant={"secondary"} size={"default"} className="rounded-full" disabled={loading}>
-                            Add style
-                        </Button>
-                    </div>
-                    <Button
-                        type="submit"
-                        variant={"default"}
-                        size={"icon"}
-                        className="rounded-full w-auto h-auto p-2"
+                  >
+                    <DicesIcon className="h-4 w-4" />
+                  </Button>
+                  <Drawer open={open} onOpenChange={setOpen}>
+                    <DrawerTrigger asChild>
+                      <Button
+                        variant="default"
+                        size={"default"}
+                        className="rounded-full justify-start"
                         disabled={loading}
-                    >
-                        {loading ? "Generating..." : <ArrowRightIcon className="h-5 w-5" />}
-                    </Button>
+                      >
+                        {selectedStatus ? <>{selectedStatus.Style}</> : <>Default Style</>}
+                      </Button>
+                    </DrawerTrigger>
+                    <DrawerContent>
+                      <DialogTitle className="hidden">Set Style</DialogTitle>
+                      <div className="mt-4 border-t">
+                        <main>
+                          <section>
+                            <section className="flex flex-wrap justify-center items-start gap-5 *:w-[15.666667%] *:max-md:w-[24.5%] *:max-sm:w-[47%] w-full my-2 max-h-96 scroll- overflow-y-auto">
+                              {statuses.map((status) => (
+                                <Button
+                                  key={status.Style}
+                                  value={status.Style}
+                                  onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                                    const value = (e.target as HTMLButtonElement).value;
+                                    setSelectedStatus(
+                                      statuses.find((priority) => priority.Style === value) || null
+                                    );
+                                    setOpen(false);
+                                  }}
+                                  className="h-32 w-full"
+                                  disabled={loading}
+                                >
+                                  {status.Style}
+                                </Button>
+                              ))}
+                            </section>
+                          </section>
+                        </main>
+                      </div>
+                    </DrawerContent>
+                  </Drawer>
                 </div>
+                <Button
+                  type="submit"
+                  variant={"default"}
+                  size={"icon"}
+                  className="rounded-full w-auto h-auto p-2"
+                  disabled={loading}
+                >
+                  {loading ? "Generating..." : <ArrowRightIcon className="h-5 w-5" />}
+                </Button>
+              </div>
             </form>
 
             {imageUrl && (

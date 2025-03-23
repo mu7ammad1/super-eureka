@@ -165,11 +165,16 @@
   }
   body {
     @apply bg-background text-foreground;
+    box-sizing: border-box;
+    margin: 0;
   }
 }
 
 .nodrag {
   pointer-events: auto;
+}
+body > main > div.w-full.flex.flex-col.justify-normal.items-center.max-w-screen-xl.min-h-screen.p-3 > div > div > div.react-flow__panel.react-flow__attribution.top.right {
+  display: none;
 }
 
 div.react-flow__handle.react-flow__handle-right.nodrag.nopan.source.connectable.connectablestart.connectableend.connectionindicator {
@@ -309,16 +314,11 @@ div.react-flow__handle.react-flow__handle-left.nodrag.nopan.target.connectable.c
   color: #5134f1 !important;
 }
 
-html,
-body {
-  margin: 0;
-  font-family: sans-serif;
-  box-sizing: border-box;
-}
-
 #app {
   width: 100vw;
   height: 100vh;
+  position: relative;
+  z-index: 5000;
 }
 
 .wrapper {
@@ -351,4 +351,18 @@ body {
  
 .react-flow.touch-flow .react-flow__handle.clickconnecting {
   animation: bounce 1600ms infinite ease-in;
+}
+
+.text-updater-node {
+  height: 50px;
+  border: 1px solid #eee;
+  padding: 5px;
+  border-radius: 5px;
+  background: white;
+}
+ 
+.text-updater-node label {
+  display: block;
+  color: #777;
+  font-size: 12px;
 }

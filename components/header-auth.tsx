@@ -66,7 +66,7 @@ export default async function AuthButton() {
   ) : (
     <div className="flex gap-2">
       <DialogAuthIn />
-      <DialogAuthUp />
+      {/* <DialogAuthUp /> */}
     </div>
   );
 }

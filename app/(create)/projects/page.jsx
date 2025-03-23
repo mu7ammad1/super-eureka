@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import {
   Background,
   ReactFlow,
@@ -8,69 +8,45 @@ import {
   addEdge,
   useReactFlow,
   ReactFlowProvider,
-  MarkerType,
   Panel,
   MiniMap,
   Controls,
 } from "@xyflow/react";
-
 import "@xyflow/react/dist/style.css";
+import TextUpdaterNode from "./TextUpdaterNode";
+import { Button } from "@/components/ui/button";
 
 const flowKey = "example-flow";
 
 const getNodeId = () => `randomnode_${+new Date()}`;
 
 const initialNodes = [
-  {
-    id: "interaction-1",
-    type: "input",
-    data: { label: "Node 1" },
-    position: { x: 250, y: 5 },
-  },
-  {
-    id: "interaction-2",
-    data: { label: "Node 2" },
-    position: { x: 100, y: 100 },
-  },
-  {
-    id: "interaction-3",
-    data: { label: "Node 3" },
-    position: { x: 400, y: 100 },
-  },
-  {
-    id: "interaction-4",
-    data: { label: "Node 4" },
-    position: { x: 400, y: 200 },
-  },
+  { id: "node-1", type: "textUpdater", position: { x: 0, y: 0 }, data: { value: "123" } },
+  { id: "node-2", type: "textUpdater", position: { x: 0, y: 200 }, data: { value: "node 2" } },
+  { id: "node-3", type: "textUpdater", position: { x: 200, y: 200 }, data: { value: "node 3" } },
 ];
 
 const initialEdges = [
-  {
-    id: "interaction-e1-2",
-    source: "interaction-1",
-    target: "interaction-2",
-    animated: true,
-  },
-  {
-    id: "interaction-e1-3",
-    source: "interaction-1",
-    target: "interaction-3",
-    animated: true,
-  },
+  { id: "edge-1", source: "node-1", target: "node-2" },
+  { id: "edge-2", source: "node-1", target: "node-3" },
 ];
 
-let id = 1;
-const getId = () => `${id++}`;
 const nodeOrigin = [0.5, 0];
 
 const AddNodeOnEdgeDrop = () => {
   const reactFlowWrapper = useRef(null);
-
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
-  const { setViewport, zoomIn, zoomOut } = useReactFlow();
+  const { setViewport } = useReactFlow();
   const [rfInstance, setRfInstance] = useState(null);
   const { screenToFlowPosition } = useReactFlow();
+
+  // دالة لتحديث بيانات العقدة
+  const onNodeChange = useCallback((nodeId, newData) => {
+    setNodes((nds) =>
+      nds.map((node) => (node.id === nodeId ? { ...node, data: newData } : node))
+    );
+  }, [setNodes]);
 
   const onSave = useCallback(() => {
     if (rfInstance) {
@@ -82,7 +58,6 @@ const AddNodeOnEdgeDrop = () => {
   const onRestore = useCallback(() => {
     const restoreFlow = async () => {
       const flow = JSON.parse(localStorage.getItem(flowKey));
-
       if (flow) {
         const { x = 0, y = 0, zoom = 1 } = flow.viewport;
         setNodes(flow.nodes || []);
@@ -90,58 +65,40 @@ const AddNodeOnEdgeDrop = () => {
         setViewport({ x, y, zoom });
       }
     };
-
     restoreFlow();
-  }, [setNodes, setViewport]);
+  }, [setNodes, setEdges, setViewport]);
 
   const onAdd = useCallback(() => {
     const newNode = {
       id: getNodeId(),
-      data: { label: "Added node" },
-      position: {
-        x: (Math.random() - 0.5) * 400,
-        y: (Math.random() - 0.5) * 400,
-      },
+      type: "textUpdater",
+      data: { value: "123", onNodeChange }, // تمرير onNodeChange
+      animated: true,
+      position: { x: (Math.random() - 0.5) * 400, y: (Math.random() - 0.5) * 400 },
     };
     setNodes((nds) => nds.concat(newNode));
-  }, [setNodes]);
+  }, [setNodes, onNodeChange]);
 
-  const onConnect = useCallback(
-    (params) => setEdges((eds) => addEdge(params, eds)),
-    []
-  );
+  const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
 
   const onConnectEnd = useCallback(
     (event, connectionState) => {
-      // عندما يتم إسقاط اتصال على اللوحة، فإنه ليس صالحًا
       if (!connectionState.isValid) {
-        // نحتاج إلى إزالة حدود الغلاف، للحصول على الموضع الصحيح
-        const id = getId();
-        const { clientX, clientY } =
-          "changedTouches" in event ? event.changedTouches[0] : event;
+        const id = getNodeId();
+        const { clientX, clientY } = "changedTouches" in event ? event.changedTouches[0] : event;
         const newNode = {
           id,
-          position: screenToFlowPosition({
-            x: clientX,
-            y: clientY,
-          }),
-          data: { label: `Node ${id}` },
+          type: "textUpdater",
+          position: screenToFlowPosition({ x: clientX, y: clientY }),
+          data: { value: ``, onNodeChange }, // تمرير onNodeChange
           animated: true,
           origin: [0.5, 0.0],
         };
-
         setNodes((nds) => nds.concat(newNode));
-        setEdges((eds) =>
-          eds.concat({
-            id,
-            source: connectionState.fromNode.id,
-            target: id,
-            animated: true,
-          })
-        );
+        setEdges((eds) => eds.concat({ id, source: connectionState.fromNode.id, target: id, animated: true }));
       }
     },
-    [screenToFlowPosition]
+    [screenToFlowPosition, setNodes, setEdges, onNodeChange]
   );
 
   const handleTransform = useCallback(() => {
@@ -153,26 +110,33 @@ const AddNodeOnEdgeDrop = () => {
   const onNodeClick = (event, node) => console.log("النقر على العقدة", node);
   const onPaneClick = (event) => console.log("النقر على اللوحة", event);
   const onPaneScroll = (event) => console.log("التمرير على اللوحة", event);
-  const onPaneContextMenu = (event) =>
-    console.log("قائمة السياق على اللوحة", event);
+  const onPaneContextMenu = (event) => console.log("قائمة السياق على اللوحة", event);
 
-  const [isSelectable, setIsSelectable] = useState(false);
-  const [isDraggable, setIsDraggable] = useState(false);
-  const [isConnectable, setIsConnectable] = useState(false);
-  const [zoomOnScroll, setZoomOnScroll] = useState(false);
-  const [panOnScroll, setPanOnScroll] = useState(false);
+  const [isSelectable, setIsSelectable] = useState(true);
+  const [isDraggable, setIsDraggable] = useState(true);
+  const [isConnectable, setIsConnectable] = useState(true);
+  const [zoomOnScroll, setZoomOnScroll] = useState(true);
+  const [panOnScroll, setPanOnScroll] = useState(true);
   const [panOnScrollMode, setPanOnScrollMode] = useState("free");
-  const [zoomOnDoubleClick, setZoomOnDoubleClick] = useState(false);
+  const [zoomOnDoubleClick, setZoomOnDoubleClick] = useState(true);
   const [panOnDrag, setPanOnDrag] = useState(true);
-  const [captureZoomClick, setCaptureZoomClick] = useState(false);
-  const [captureZoomScroll, setCaptureZoomScroll] = useState(false);
-  const [captureElementClick, setCaptureElementClick] = useState(false);
+  const [captureZoomClick, setCaptureZoomClick] = useState(true);
+  const [captureZoomScroll, setCaptureZoomScroll] = useState(true);
+  const [captureElementClick, setCaptureElementClick] = useState(true);
+
+  // إضافة onNodeChange إلى جميع العقد
+  const updatedNodes = useMemo(() =>
+    nodes.map((node) => ({ ...node, data: { ...node.data, onNodeChange } })),
+    [nodes, onNodeChange]
+  );
+
+  const nodeTypes = useMemo(() => ({ textUpdater: TextUpdaterNode }), []);
 
   return (
-    <div className="wrapper" ref={reactFlowWrapper}>
+    <div className="wrapper" ref={reactFlowWrapper} style={{ height: "100vh" }}>
       <ReactFlow
         style={{ backgroundColor: "#202020" }}
-        nodes={nodes}
+        nodes={updatedNodes}
         edges={edges}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
@@ -198,16 +162,17 @@ const AddNodeOnEdgeDrop = () => {
         attributionPosition="top-right"
         className="touch-flow"
         onInit={setRfInstance}
+        nodeTypes={nodeTypes}
       >
         <MiniMap />
         <Controls />
         <Panel position="top-right">
-          <button onClick={onSave}>save</button>
-          <button onClick={onRestore}>restore</button>
-          <button onClick={onAdd}>add node</button>
+          <Button onClick={onSave}>save</Button>
+          <Button onClick={onRestore}>restore</Button>
+          <Button onClick={onAdd}>add node</Button>
         </Panel>
 
-        <Panel position="topleft">
+        <Panel position="top-left">
           <div>
             <label htmlFor="draggable">
               <input
@@ -337,9 +302,7 @@ const AddNodeOnEdgeDrop = () => {
                 id="captureelementclick"
                 type="checkbox"
                 checked={captureElementClick}
-                onChange={(event) =>
-                  setCaptureElementClick(event.target.checked)
-                }
+                onChange={(event) => setCaptureElementClick(event.target.checked)}
                 className="react-flow__captureelementclick"
               />
               capture onElementClick

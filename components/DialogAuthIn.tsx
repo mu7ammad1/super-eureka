@@ -22,7 +22,7 @@ export function DialogAuthIn() {
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button size="default" variant={"secondary"} className="rounded-full">Sign in</Button>
+                <Button size="default" variant={"outline"} className="rounded-full">Sign in for Free</Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-md max-sm:min-h-full border bg-gradient-to-b from-violet-500 to-white/0 backdrop-blur-3xl rounded-2xl p-8">
                 <DialogHeader>
