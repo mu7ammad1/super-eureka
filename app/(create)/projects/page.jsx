@@ -13,23 +13,27 @@ import {
   Controls,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
+
 import TextUpdaterNode from "./TextUpdaterNode";
 import { Button } from "@/components/ui/button";
+import { ZoomSlider } from "@/components/zoom-slider";
+import { PlusCircleIcon } from "lucide-react";
 
 const flowKey = "example-flow";
 
 const getNodeId = () => `randomnode_${+new Date()}`;
 
 const initialNodes = [
-  { id: "node-1", type: "textUpdater", position: { x: 0, y: 0 }, data: { value: "123" } },
-  { id: "node-2", type: "textUpdater", position: { x: 0, y: 200 }, data: { value: "node 2" } },
-  { id: "node-3", type: "textUpdater", position: { x: 200, y: 200 }, data: { value: "node 3" } },
+  {
+    id: "node-1",
+    type: "textUpdater",
+    position: { x: 0, y: 0 },
+    data: { value: "123" },
+    DragEvent: true,
+  },
 ];
 
-const initialEdges = [
-  { id: "edge-1", source: "node-1", target: "node-2" },
-  { id: "edge-2", source: "node-1", target: "node-3" },
-];
+const initialEdges = [];
 
 const nodeOrigin = [0.5, 0];
 
@@ -42,11 +46,16 @@ const AddNodeOnEdgeDrop = () => {
   const { screenToFlowPosition } = useReactFlow();
 
   // دالة لتحديث بيانات العقدة
-  const onNodeChange = useCallback((nodeId, newData) => {
-    setNodes((nds) =>
-      nds.map((node) => (node.id === nodeId ? { ...node, data: newData } : node))
-    );
-  }, [setNodes]);
+  const onNodeChange = useCallback(
+    (nodeId, newData) => {
+      setNodes((nds) =>
+        nds.map((node) =>
+          node.id === nodeId ? { ...node, data: newData } : node
+        )
+      );
+    },
+    [setNodes]
+  );
 
   const onSave = useCallback(() => {
     if (rfInstance) {
@@ -74,18 +83,25 @@ const AddNodeOnEdgeDrop = () => {
       type: "textUpdater",
       data: { value: "123", onNodeChange }, // تمرير onNodeChange
       animated: true,
-      position: { x: (Math.random() - 0.5) * 400, y: (Math.random() - 0.5) * 400 },
+      position: {
+        x: (Math.random() - 0.5) * 400,
+        y: (Math.random() - 0.5) * 400,
+      },
     };
     setNodes((nds) => nds.concat(newNode));
   }, [setNodes, onNodeChange]);
 
-  const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
+  const onConnect = useCallback(
+    (params) => setEdges((eds) => addEdge(params, eds)),
+    [setEdges]
+  );
 
   const onConnectEnd = useCallback(
     (event, connectionState) => {
       if (!connectionState.isValid) {
         const id = getNodeId();
-        const { clientX, clientY } = "changedTouches" in event ? event.changedTouches[0] : event;
+        const { clientX, clientY } =
+          "changedTouches" in event ? event.changedTouches[0] : event;
         const newNode = {
           id,
           type: "textUpdater",
@@ -95,7 +111,14 @@ const AddNodeOnEdgeDrop = () => {
           origin: [0.5, 0.0],
         };
         setNodes((nds) => nds.concat(newNode));
-        setEdges((eds) => eds.concat({ id, source: connectionState.fromNode.id, target: id, animated: true }));
+        setEdges((eds) =>
+          eds.concat({
+            id,
+            source: connectionState.fromNode.id,
+            target: id,
+            animated: true,
+          })
+        );
       }
     },
     [screenToFlowPosition, setNodes, setEdges, onNodeChange]
@@ -110,13 +133,14 @@ const AddNodeOnEdgeDrop = () => {
   const onNodeClick = (event, node) => console.log("النقر على العقدة", node);
   const onPaneClick = (event) => console.log("النقر على اللوحة", event);
   const onPaneScroll = (event) => console.log("التمرير على اللوحة", event);
-  const onPaneContextMenu = (event) => console.log("قائمة السياق على اللوحة", event);
+  const onPaneContextMenu = (event) =>
+    console.log("قائمة السياق على اللوحة", event);
 
   const [isSelectable, setIsSelectable] = useState(true);
   const [isDraggable, setIsDraggable] = useState(true);
   const [isConnectable, setIsConnectable] = useState(true);
   const [zoomOnScroll, setZoomOnScroll] = useState(true);
-  const [panOnScroll, setPanOnScroll] = useState(true);
+  const [panOnScroll, setPanOnScroll] = useState(false);
   const [panOnScrollMode, setPanOnScrollMode] = useState("free");
   const [zoomOnDoubleClick, setZoomOnDoubleClick] = useState(true);
   const [panOnDrag, setPanOnDrag] = useState(true);
@@ -125,17 +149,22 @@ const AddNodeOnEdgeDrop = () => {
   const [captureElementClick, setCaptureElementClick] = useState(true);
 
   // إضافة onNodeChange إلى جميع العقد
-  const updatedNodes = useMemo(() =>
-    nodes.map((node) => ({ ...node, data: { ...node.data, onNodeChange } })),
+  const updatedNodes = useMemo(
+    () =>
+      nodes.map((node) => ({ ...node, data: { ...node.data, onNodeChange } })),
     [nodes, onNodeChange]
   );
 
   const nodeTypes = useMemo(() => ({ textUpdater: TextUpdaterNode }), []);
 
   return (
-    <div className="wrapper" ref={reactFlowWrapper} style={{ height: "100vh" }}>
+    <div
+      className="wrapper"
+      ref={reactFlowWrapper}
+      style={{ height: "100vh", width: "100%", padding: "0px", margin: "0px" }}
+    >
       <ReactFlow
-        style={{ backgroundColor: "#202020" }}
+        style={{ backgroundColor: "#000000" }}
         nodes={updatedNodes}
         edges={edges}
         onNodesChange={onNodesChange}
@@ -164,15 +193,69 @@ const AddNodeOnEdgeDrop = () => {
         onInit={setRfInstance}
         nodeTypes={nodeTypes}
       >
-        <MiniMap />
-        <Controls />
-        <Panel position="top-right">
-          <Button onClick={onSave}>save</Button>
-          <Button onClick={onRestore}>restore</Button>
-          <Button onClick={onAdd}>add node</Button>
+        {/* <MiniMap /> */}
+        {/* <Controls /> */}
+        <Panel
+          position="top-right"
+          className="flex justify-center items-center gap-5"
+        >
+          <Button size={"lg"} variant={"default"} onClick={onSave}>
+            save
+          </Button>
+          <Button size={"lg"} variant={"default"} onClick={onRestore}>
+            restore
+          </Button>
+          <Button size={"lg"} variant={"default"} onClick={onAdd}>
+            add node
+          </Button>
+        </Panel>
+        <Panel
+          position="top-left"
+          className="flex justify-center items-center gap-1"
+        >
+          <div
+            className="w-80 h-20 rounded-lg p-1"
+            style={{ backgroundColor: "#262626" }}
+          >
+            <input
+              id="text"
+              name="text"
+              className="w-full p-3 rounded border-none focus:outline-none"
+              style={{ backgroundColor: "#6666ff00" }}
+              defaultValue={""}
+              placeholder="اكتب هنا..."
+            />
+          </div>
         </Panel>
 
-        <Panel position="top-left">
+        <Panel
+          className=" gap-1"
+          style={{
+            position: "fixed",
+            left: "0px",
+            bottom: "10px",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+          }}
+        >
+          <div
+            className="rounded-lg p-1 flex flex-col justify-center items-center gap-2"
+            style={{ backgroundColor: "#262626" }}
+          >
+            <Button size={"icon"} variant={"default"} onClick={onSave}>
+              <PlusCircleIcon className="w-5 h-5" />
+            </Button>
+            <Button size={"icon"} variant={"default"} onClick={onRestore}>
+              <PlusCircleIcon className="w-5 h-5" />
+            </Button>
+            <Button size={"icon"} variant={"default"} onClick={onAdd}>
+              <PlusCircleIcon className="w-5 h-5" />
+            </Button>
+          </div>
+        </Panel>
+
+        <Panel position="top-left" className="hidden">
           <div>
             <label htmlFor="draggable">
               <input
@@ -302,7 +385,9 @@ const AddNodeOnEdgeDrop = () => {
                 id="captureelementclick"
                 type="checkbox"
                 checked={captureElementClick}
-                onChange={(event) => setCaptureElementClick(event.target.checked)}
+                onChange={(event) =>
+                  setCaptureElementClick(event.target.checked)
+                }
                 className="react-flow__captureelementclick"
               />
               capture onElementClick
@@ -310,14 +395,17 @@ const AddNodeOnEdgeDrop = () => {
           </div>
         </Panel>
 
+        <ZoomSlider position="bottom-right" />
         <Background />
       </ReactFlow>
     </div>
   );
 };
 
-export default () => (
-  <ReactFlowProvider>
-    <AddNodeOnEdgeDrop />
-  </ReactFlowProvider>
-);
+export default function Page() {
+  return (
+    <ReactFlowProvider>
+      <AddNodeOnEdgeDrop />
+    </ReactFlowProvider>
+  );
+}

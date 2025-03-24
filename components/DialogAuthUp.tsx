@@ -25,7 +25,7 @@ export default function DialogAuthUp() {
             <DialogTrigger asChild>
                 <Button size="default" variant={"default"} className="rounded-full">Sign up for Free</Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-md max-sm:min-h-full border bg-gradient-to-b from-clr-4/80 to-white/0 backdrop-blur-3xl rounded-2xl p-8">
+            <DialogContent className="sm:max-w-md max-sm:min-h-full border bg-gradient-to-b from-clr-1/80 to-white/0 backdrop-blur-3xl rounded-2xl p-8">
                 <DialogHeader>
                     <DialogTitle className="text-2xl font-medium">Sign up</DialogTitle>
                     <DialogDescription>

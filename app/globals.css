@@ -241,10 +241,11 @@ div.react-flow__handle.react-flow__handle-left.nodrag.nopan.target.connectable.c
   justify-content: center;
   align-items: center;
   text-align: center;
-  padding: 10px;
+  padding: 0px;
+  margin: 0px;
   font-size: 12px;
   flex-direction: column;
-  border: var(--xy-node-border-default);
+  border: none;
   color: var(--xy-node-color, var(--xy-node-color-default));
 }
 
@@ -322,7 +323,7 @@ div.react-flow__handle.react-flow__handle-left.nodrag.nopan.target.connectable.c
 }
 
 .wrapper {
-  flex-grow: 1;
+  /* flex-grow: 1; */
   height: 100vh !important;
   width: 100% !important;
   color: #5134f1;
@@ -365,4 +366,27 @@ div.react-flow__handle.react-flow__handle-left.nodrag.nopan.target.connectable.c
   display: block;
   color: #777;
   font-size: 12px;
+}
+
+
+
+
+.hhh {
+  display: none !important;
+}
+
+
+
+
+
+
+.image-background {
+  background-image: url('/assets/images/0IOrVXfffIw7k85h-generated_image.jpg');
+  background-size: cover;
+  background-position: center;
+  padding: 10px;
+  border-radius: 8px;
+  height: 100px;
+  width: 100px;
+  /* display: block; */
 }

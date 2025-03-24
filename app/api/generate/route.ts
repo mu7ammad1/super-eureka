@@ -8,7 +8,7 @@ interface PostRequestBody {
 }
 
 export async function POST(request: Request): Promise<Response> {
-  const { prompt, style = "realistic", aspect_ratio = "1:1", seed = "5" }: PostRequestBody =
+  const { prompt, style = "realistic", aspect_ratio = "1:1", seed = "5" } =
     await request.json();
 
   if (!prompt) {
@@ -19,7 +19,7 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   const myHeaders = new Headers();
-  myHeaders.append("Authorization", "Bearer vk-tmmUHQgIngRYYNx33je4LFQ72DZ5Es09A2mqanhVCbus8V");
+  myHeaders.append("Authorization", "Bearer vk-6SoAsyKQgfANvetVD22PM3vXuWqkASFhBaqJqFSPvLyMV8");
 
   const formdata = new FormData();
   formdata.append("prompt", prompt);
@@ -27,29 +27,42 @@ export async function POST(request: Request): Promise<Response> {
   formdata.append("aspect_ratio", aspect_ratio);
   formdata.append("seed", seed);
 
-  const response: Response = await fetch("https://api.vyro.ai/v2/image/generations", {
-    method: "POST",
-    headers: myHeaders,
-    body: formdata,
-    redirect: "follow",
-  });
-
-  if (!response.ok) {
-    const errorText: string = await response.text();
-    return new Response(JSON.stringify({ success: false, error: `API Error: ${errorText}` }), {
-      status: response.status,
-      headers: { "Content-Type": "application/json" },
+  try {
+    const response = await fetch("https://api.vyro.ai/v2/image/generations", {
+      method: "POST",
+      headers: myHeaders,
+      body: formdata,
+      redirect: "follow",
     });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      return new Response(
+        JSON.stringify({ success: false, error: `API Error: ${errorText}` }),
+        {
+          status: response.status,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    const imageBuffer = await response.arrayBuffer();
+    const contentType = response.headers.get("Content-Type") || "image/png";
+
+    return new Response(imageBuffer, {
+      status: 200,
+      headers: {
+        "Content-Type": contentType,
+        "Cache-Control": "no-cache",
+      },
+    });
+  } catch (error) {
+    return new Response(
+      JSON.stringify({ success: false, error: error instanceof Error ? error.message : 'An unknown error occurred' }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
   }
-
-  const imageBuffer: ArrayBuffer = await response.arrayBuffer();
-  const contentType: string = response.headers.get("Content-Type") || "image/png";
-
-  return new Response(imageBuffer, {
-    status: 200,
-    headers: {
-      "Content-Type": contentType,
-      "Cache-Control": "no-cache",
-    },
-  });
 }

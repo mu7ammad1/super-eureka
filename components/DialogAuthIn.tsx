@@ -15,25 +15,22 @@ import Link from "next/link"
 import { SubmitButton } from "./submit-button"
 import { signInAction } from "@/app/actions/actions"
 import { X } from "lucide-react"
+import SignInWithGoogleButton from "./SignInWith0AuthButton"
 
-     
+
 
 export function DialogAuthIn() {
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button size="default" variant={"outline"} className="rounded-full">Sign in for Free</Button>
+                <Button size="default" variant={"outline"} className="rounded-full">Make Account</Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-md max-sm:min-h-full border bg-gradient-to-b from-violet-500 to-white/0 backdrop-blur-3xl rounded-2xl p-8">
+            <DialogContent className="sm:max-w-md max-sm:min-h-full border bg-gradient-to-b from-indigo-500 to-white/0 backdrop-blur-3xl rounded-2xl p-8">
                 <DialogHeader>
-                    <DialogTitle className="text-2xl font-medium">Sign in</DialogTitle>
-                    <DialogDescription>
-                        Don't have an account? {" "}
-                        <Link className="text-foreground font-medium underline" href="/sign-up">
-                            Sign up for Free
-                        </Link>
-                    </DialogDescription>
+                    <DialogTitle className="text-2xl font-medium">Make Account for Free</DialogTitle>
                 </DialogHeader>
+                <SignInWithGoogleButton />
+                <hr className="mt-4 border-foreground h-0.5 border-dotted dotted" />
                 <ElementSignIn />
                 <DialogFooter className="sm:justify-start absolute top-5 right-5">
                     <DialogClose asChild>

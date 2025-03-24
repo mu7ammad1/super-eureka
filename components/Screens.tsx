@@ -54,7 +54,7 @@ function Screens_2() {
                         Create stunning images with Imagen Fly, the fastest AI image generator tool.
                     </p>
                 </div>
-                <div className='flex justify-center items-center gap-5'>
+                <div className='flex justify-center items-center gap-5 max-sm:flex-col'>
                     <Link href={'/projects'}>
                         <Button variant={'default'} size={'lg'} className='rounded-full uppercase'>Go New project</Button>
                     </Link>
@@ -85,71 +85,71 @@ function Screens_2() {
             <section className="flex flex-col justify-center items-center w-full">
 
                 <Carousel className='w-full max-w-screen-xl'>
-                    <CarouselContent className="*:basis-full *:sm:basis-1/2 *:md:basis-1/3 *:lg:basis-1/4 w-full">
+                    <CarouselContent className="*:basis-full *:max-sm:basis-[90%] *:md:basis-1/3 *:lg:basis-1/4 w-full">
                         <CarouselItem>
-                            <Card className='h-[260px]'>
+                            <Card className='h-[360px]'>
                                 <CardContent className="flex items-center justify-center h-full p-1">
-                                    <Image src={ima} alt='id image' className='h-full w-full object-fill rounded-lg' />
+                                    <Image src={ima} alt='id image' className='h-full w-full object-cover rounded-lg' />
                                 </CardContent>
                             </Card>
                             <div className='flex justify-center items-center gap-3 mt-2'>
-                                <Button variant={'secondary'} size={'sm'} className='rounded-full uppercase'>Visit <EyeIcon absoluteStrokeWidth className='w-5 h-5' /></Button>
-                                <Button variant={'secondary'} size={'sm'} className='rounded-full uppercase'>Clone <CirclePlusIcon absoluteStrokeWidth className='w-5 h-5' /></Button>
+                                <Button variant={'secondary'} size={'lg'} className='rounded-full uppercase'>Visit <EyeIcon absoluteStrokeWidth className='w-5 h-5' /></Button>
+                                <Button variant={'secondary'} size={'lg'} className='rounded-full uppercase'>Clone <CirclePlusIcon absoluteStrokeWidth className='w-5 h-5' /></Button>
                             </div>
                         </CarouselItem>
                         <CarouselItem>
-                            <Card className='h-[260px]'>
+                            <Card className='h-[360px]'>
                                 <CardContent className="flex items-center justify-center h-full p-1">
-                                    <Image src={ima2} alt='id image' className='h-full w-full object-fill rounded-lg' />
+                                    <Image src={ima2} alt='id image' className='h-full w-full object-cover rounded-lg' />
                                 </CardContent>
                             </Card>
                             <div className='flex justify-center items-center gap-3 mt-2'>
-                                <Button variant={'secondary'} size={'sm'} className='rounded-full uppercase'>Visit <EyeIcon absoluteStrokeWidth className='w-5 h-5' /></Button>
-                                <Button variant={'secondary'} size={'sm'} className='rounded-full uppercase'>Clone <CirclePlusIcon absoluteStrokeWidth className='w-5 h-5' /></Button>
+                                <Button variant={'secondary'} size={'lg'} className='rounded-full uppercase'>Visit <EyeIcon absoluteStrokeWidth className='w-5 h-5' /></Button>
+                                <Button variant={'secondary'} size={'lg'} className='rounded-full uppercase'>Clone <CirclePlusIcon absoluteStrokeWidth className='w-5 h-5' /></Button>
                             </div>
                         </CarouselItem>
                         <CarouselItem>
-                            <Card className='h-[260px]'>
+                            <Card className='h-[360px]'>
                                 <CardContent className="flex items-center justify-center h-full p-1">
-                                    <Image src={ima} alt='id image' className='h-full w-full object-fill rounded-lg' />
+                                    <Image src={ima} alt='id image' className='h-full w-full object-cover rounded-lg' />
                                 </CardContent>
                             </Card>
                             <div className='flex justify-center items-center gap-3 mt-2'>
-                                <Button variant={'secondary'} size={'sm'} className='rounded-full uppercase'>Visit <EyeIcon absoluteStrokeWidth className='w-5 h-5' /></Button>
-                                <Button variant={'secondary'} size={'sm'} className='rounded-full uppercase'>Clone <CirclePlusIcon absoluteStrokeWidth className='w-5 h-5' /></Button>
+                                <Button variant={'secondary'} size={'lg'} className='rounded-full uppercase'>Visit <EyeIcon absoluteStrokeWidth className='w-5 h-5' /></Button>
+                                <Button variant={'secondary'} size={'lg'} className='rounded-full uppercase'>Clone <CirclePlusIcon absoluteStrokeWidth className='w-5 h-5' /></Button>
                             </div>
                         </CarouselItem>
                         <CarouselItem>
-                            <Card className='h-[260px]'>
+                            <Card className='h-[360px]'>
                                 <CardContent className="flex items-center justify-center h-full p-1">
-                                    <Image src={ima} alt='id image' className='h-full w-full object-fill rounded-lg' />
+                                    <Image src={ima} alt='id image' className='h-full w-full object-cover rounded-lg' />
                                 </CardContent>
                             </Card>
                             <div className='flex justify-center items-center gap-3 mt-2'>
-                                <Button variant={'secondary'} size={'sm'} className='rounded-full uppercase'>Visit <EyeIcon absoluteStrokeWidth className='w-5 h-5' /></Button>
-                                <Button variant={'secondary'} size={'sm'} className='rounded-full uppercase'>Clone <CirclePlusIcon absoluteStrokeWidth className='w-5 h-5' /></Button>
+                                <Button variant={'secondary'} size={'lg'} className='rounded-full uppercase'>Visit <EyeIcon absoluteStrokeWidth className='w-5 h-5' /></Button>
+                                <Button variant={'secondary'} size={'lg'} className='rounded-full uppercase'>Clone <CirclePlusIcon absoluteStrokeWidth className='w-5 h-5' /></Button>
                             </div>
                         </CarouselItem>
                         <CarouselItem>
-                            <Card className='h-[260px]'>
+                            <Card className='h-[360px]'>
                                 <CardContent className="flex items-center justify-center h-full p-1">
-                                    <Image src={ima} alt='id image' className='h-full w-full object-fill rounded-lg' />
+                                    <Image src={ima} alt='id image' className='h-full w-full object-cover rounded-lg' />
                                 </CardContent>
                             </Card>
                             <div className='flex justify-center items-center gap-3 mt-2'>
-                                <Button variant={'secondary'} size={'sm'} className='rounded-full uppercase'>Visit <EyeIcon absoluteStrokeWidth className='w-5 h-5' /></Button>
-                                <Button variant={'secondary'} size={'sm'} className='rounded-full uppercase'>Clone <CirclePlusIcon absoluteStrokeWidth className='w-5 h-5' /></Button>
+                                <Button variant={'secondary'} size={'lg'} className='rounded-full uppercase'>Visit <EyeIcon absoluteStrokeWidth className='w-5 h-5' /></Button>
+                                <Button variant={'secondary'} size={'lg'} className='rounded-full uppercase'>Clone <CirclePlusIcon absoluteStrokeWidth className='w-5 h-5' /></Button>
                             </div>
                         </CarouselItem>
                         <CarouselItem>
-                            <Card className='h-[260px]'>
+                            <Card className='h-[360px]'>
                                 <CardContent className="flex items-center justify-center h-full p-1">
-                                    <Image src={ima} alt='id image' className='h-full w-full object-fill rounded-lg' />
+                                    <Image src={ima} alt='id image' className='h-full w-full object-cover rounded-lg' />
                                 </CardContent>
                             </Card>
                             <div className='flex justify-center items-center gap-3 mt-2'>
-                                <Button variant={'secondary'} size={'sm'} className='rounded-full uppercase'>Visit <EyeIcon absoluteStrokeWidth className='w-5 h-5' /></Button>
-                                <Button variant={'secondary'} size={'sm'} className='rounded-full uppercase'>Clone <CirclePlusIcon absoluteStrokeWidth className='w-5 h-5' /></Button>
+                                <Button variant={'secondary'} size={'lg'} className='rounded-full uppercase'>Visit <EyeIcon absoluteStrokeWidth className='w-5 h-5' /></Button>
+                                <Button variant={'secondary'} size={'lg'} className='rounded-full uppercase'>Clone <CirclePlusIcon absoluteStrokeWidth className='w-5 h-5' /></Button>
                             </div>
                         </CarouselItem>
                     </CarouselContent>
@@ -171,7 +171,7 @@ function Screens_2() {
 
             <section className="flex flex-col justify-center items-center w-full pb-16 pt-0">
 
-                <Accordion type="single" className='w-full h-full max-w-4xl' collapsible>
+                <Accordion type="single" className='w-full h-full max-w-4xl px-3' collapsible>
                     <AccordionItem value="item-1">
                         <AccordionTrigger className='text-3xl'>How can I use this platform to create images?</AccordionTrigger>
                         <AccordionContent className='text-base'>
