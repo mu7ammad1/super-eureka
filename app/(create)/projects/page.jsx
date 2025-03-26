@@ -17,7 +17,8 @@ import "@xyflow/react/dist/style.css";
 import TextUpdaterNode from "./TextUpdaterNode";
 import { Button } from "@/components/ui/button";
 import { ZoomSlider } from "@/components/zoom-slider";
-import { PlusCircleIcon } from "lucide-react";
+import { BookmarkIcon, LucideRotate3d, PlusCircleIcon } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 const flowKey = "example-flow";
 
@@ -196,20 +197,6 @@ const AddNodeOnEdgeDrop = () => {
         {/* <MiniMap /> */}
         {/* <Controls /> */}
         <Panel
-          position="top-right"
-          className="flex justify-center items-center gap-5"
-        >
-          <Button size={"lg"} variant={"default"} onClick={onSave}>
-            save
-          </Button>
-          <Button size={"lg"} variant={"default"} onClick={onRestore}>
-            restore
-          </Button>
-          <Button size={"lg"} variant={"default"} onClick={onAdd}>
-            add node
-          </Button>
-        </Panel>
-        <Panel
           position="top-left"
           className="flex justify-center items-center gap-1"
         >
@@ -217,7 +204,7 @@ const AddNodeOnEdgeDrop = () => {
             className="w-80 h-20 rounded-lg p-1"
             style={{ backgroundColor: "#262626" }}
           >
-            <input
+            <Input
               id="text"
               name="text"
               className="w-full p-3 rounded border-none focus:outline-none"
@@ -240,17 +227,37 @@ const AddNodeOnEdgeDrop = () => {
           }}
         >
           <div
-            className="rounded-lg p-1 flex flex-col justify-center items-center gap-2"
-            style={{ backgroundColor: "#262626" }}
+            className="rounded-lg p-1 flex flex-col justify-center items-center gap-2 backdrop-blur-md"
+            style={{
+              backgroundColor: "#26262690",
+              padding: "12px 8px",
+              borderRadius: "50px",
+              scale: "1.2",
+            }}
           >
-            <Button size={"icon"} variant={"default"} onClick={onSave}>
+            <Button
+              size={"icon"}
+              variant={"default"}
+              className="rounded-full"
+              onClick={onAdd}
+            >
               <PlusCircleIcon className="w-5 h-5" />
             </Button>
-            <Button size={"icon"} variant={"default"} onClick={onRestore}>
-              <PlusCircleIcon className="w-5 h-5" />
+            <Button
+              size={"icon"}
+              variant={"default"}
+              className="rounded-full"
+              onClick={onRestore}
+            >
+              <LucideRotate3d className="w-5 h-5" />
             </Button>
-            <Button size={"icon"} variant={"default"} onClick={onAdd}>
-              <PlusCircleIcon className="w-5 h-5" />
+            <Button
+              size={"icon"}
+              variant={"default"}
+              className="rounded-full"
+              onClick={onSave}
+            >
+              <BookmarkIcon className="w-5 h-5" />
             </Button>
           </div>
         </Panel>
