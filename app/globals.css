@@ -173,7 +173,12 @@
 .nodrag {
   pointer-events: auto;
 }
-body > main > div.w-full.flex.flex-col.justify-normal.items-center.max-w-screen-xl.min-h-screen.p-3 > div > div > div.react-flow__panel.react-flow__attribution.top.right {
+body
+  > main
+  > div.w-full.flex.flex-col.justify-normal.items-center.max-w-screen-xl.min-h-screen.p-3
+  > div
+  > div
+  > div.react-flow__panel.react-flow__attribution.top.right {
   display: none;
 }
 
@@ -332,15 +337,15 @@ div.react-flow__handle.react-flow__handle-left.nodrag.nopan.target.connectable.c
   width: 20px;
   height: 20px;
 }
- 
+
 .touch-flow .react-flow__handle-right {
   --translate: translate(50%, -50%);
 }
- 
+
 .touch-flow .react-flow__handle-left {
   --translate: translate(-50%, -50%);
 }
- 
+
 @keyframes bounce {
   0% {
     transform: var(--translate) scale(1);
@@ -349,7 +354,7 @@ div.react-flow__handle.react-flow__handle-left.nodrag.nopan.target.connectable.c
     transform: var(--translate) scale(1.1);
   }
 }
- 
+
 .react-flow.touch-flow .react-flow__handle.clickconnecting {
   animation: bounce 1600ms infinite ease-in;
 }
@@ -361,27 +366,29 @@ div.react-flow__handle.react-flow__handle-left.nodrag.nopan.target.connectable.c
   border-radius: 5px;
   background: white;
 }
- 
+
 .text-updater-node label {
   display: block;
   color: #777;
   font-size: 12px;
 }
 
-
-
-
 .hhh {
   display: none !important;
 }
 
+.im {
+  background-image: url("/assets/images/videoframe_20483.png") !important;
+  background-size: "contain" !important;
+  background-repeat: "auto" !important;
+  background-position: "center" !important;
+  
 
-
-
+}
 
 
 .image-background {
-  background-image: url('/assets/images/0IOrVXfffIw7k85h-generated_image.jpg');
+  background-image: url("/assets/images/0IOrVXfffIw7k85h-generated_image.jpg");
   background-size: cover;
   background-position: center;
   padding: 10px;
@@ -389,4 +396,13 @@ div.react-flow__handle.react-flow__handle-left.nodrag.nopan.target.connectable.c
   height: 100px;
   width: 100px;
   /* display: block; */
+}
+
+
+
+body > main > div.w-full.flex.flex-col.justify-normal.items-center.max-w-screen-xl.min-h-screen.p-3 > main > div > div > div.react-flow__panel.react-flow__attribution.top.right > a {
+  display: none;
+}
+body > main > div.w-full.flex.flex-col.justify-normal.items-center.max-w-screen-xl.min-h-screen.p-3 > main > div > div > div.react-flow__panel.react-flow__attribution.top.right {
+  display: none;
 }

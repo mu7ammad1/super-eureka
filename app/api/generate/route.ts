@@ -1,25 +1,19 @@
-export const runtime = "edge";
-
-interface PostRequestBody {
-  prompt: string;
-  style?: string;
-  aspect_ratio?: string;
-  seed?: string;
-}
-
 export async function POST(request: Request): Promise<Response> {
   const { prompt, style = "realistic", aspect_ratio = "1:1", seed = "5" } =
     await request.json();
 
   if (!prompt) {
-    return new Response(JSON.stringify({ error: "Prompt is required" }), {
-      status: 400,
-      headers: { "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({ success: false, error: "Prompt is required" }),
+      {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
   }
 
   const myHeaders = new Headers();
-  myHeaders.append("Authorization", "Bearer vk-6SoAsyKQgfANvetVD22PM3vXuWqkASFhBaqJqFSPvLyMV8");
+  myHeaders.append("Authorization", "Bearer vk-z4N4bJQf3sxcRemicDRJNW1I1wvJNaDxw5dRyd32eOA01");
 
   const formdata = new FormData();
   formdata.append("prompt", prompt);
@@ -36,9 +30,18 @@ export async function POST(request: Request): Promise<Response> {
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
+      let errorDetails;
+      try {
+        errorDetails = await response.json(); // Attempt to parse JSON
+      } catch {
+        errorDetails = { message: await response.text() }; // Fallback to text if JSON fails
+      }
       return new Response(
-        JSON.stringify({ success: false, error: `API Error: ${errorText}` }),
+        JSON.stringify({
+          success: false,
+          error: errorDetails.message || "Failed to generate image",
+          code: errorDetails.code || response.status,
+        }),
         {
           status: response.status,
           headers: { "Content-Type": "application/json" },
@@ -58,7 +61,10 @@ export async function POST(request: Request): Promise<Response> {
     });
   } catch (error) {
     return new Response(
-      JSON.stringify({ success: false, error: error instanceof Error ? error.message : 'An unknown error occurred' }),
+      JSON.stringify({
+        success: false,
+        error: error instanceof Error ? error.message : "An unknown error occurred",
+      }),
       {
         status: 500,
         headers: { "Content-Type": "application/json" },

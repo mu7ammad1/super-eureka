@@ -14,9 +14,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { cn } from "@/lib/utils"
-
+} from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 
 type Status = {
   Style: string;
@@ -146,11 +145,6 @@ export default function NewScreen() {
     },
   ];
 
-
-
-
-
-
   const randomizePrompt = () => {
     const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
     const randomPrompt = randomStatus.label[Math.floor(Math.random() * randomStatus.label.length)];
@@ -168,81 +162,90 @@ export default function NewScreen() {
     setLoading(true);
     setError(null);
 
-    const numberOfImages = 2; // تم تقليله إلى 1 للاختبار، يمكنك زيادته لاحقًا
+    const numberOfImages = 2;
 
-    const imagePromises = Array.from({ length: numberOfImages }, async () => {
-      try {
-        const response = await fetch("/api/generate", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            prompt,
-            style: selectedStatus?.Style.toLowerCase() || "realistic",
-            aspect_ratio: "1:1",
-            seed: Math.random().toString().split(".")[1],
-          }),
-        });
+    const { data: { user } } = await supabase.auth.getUser();
 
-        if (!response.ok) {
-          let errorMessage;
-          try {
-            const errorData = await response.json();
-            if (errorData.code === 1101) {
-              errorMessage = "Not enough tokens to generate images. Please recharge your vyro.ai account.";
-            } else {
-              errorMessage = errorData.error || "Failed to generate image";
+    if (user) {
+      const imagePromises = Array.from({ length: numberOfImages }, async () => {
+        try {
+
+          const response = await fetch("/api/generate", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              prompt,
+              style: selectedStatus?.Style.toLowerCase() || "realistic",
+              aspect_ratio: "1:1",
+              seed: Math.random().toString().split(".")[1],
+            }),
+          });
+
+          if (!response.ok) {
+            let errorMessage;
+            try {
+              const errorData = await response.json();
+              if (errorData.code === 1101) {
+                errorMessage = "Not enough tokens to generate images. Please recharge your vyro.ai account.";
+              } else {
+                errorMessage = errorData.error || "Failed to generate image";
+              }
+            } catch {
+              errorMessage = await response.text();
             }
-          } catch {
-            errorMessage = await response.text(); // إذا لم يكن JSON، استخدم النص الخام
+            throw new Error(errorMessage);
           }
-          throw new Error(errorMessage);
+
+          const blob = await response.blob();
+          const fileName = `imagenFly-${Math.random().toString(36).substring(2)}`;
+
+          const { error: uploadError } = await supabase.storage
+            .from("imagenfly")
+            .upload(fileName, blob, { contentType: "image/png" });
+
+          if (uploadError) throw new Error(uploadError.message);
+
+          const { data: publicUrlData } = supabase.storage
+            .from("imagenfly")
+            .getPublicUrl(fileName);
+
+          return { url: publicUrlData?.publicUrl || "", fileName };
+        } catch (err) {
+          throw err instanceof Error ? err : new Error("Unknown error");
         }
+      });
 
-        const blob = await response.blob();
-        const fileName = `imagenFly-${Math.random().toString(36).substring(2)}`;
+      try {
+        const results = await Promise.all(imagePromises);
 
-        const { error: uploadError } = await supabase.storage
-          .from("imagenfly")
-          .upload(fileName, blob, { contentType: "image/png" });
+        const photosData = results.map((result) => ({
+          url: result.url,
+          prompt, // تم تصحيح "promp" إلى "prompt"
+          id_user: user?.id, // تغيير "id" إلى "user_id" لتجنب الالتباس مع المفتاح الأساسي
+          style: selectedStatus?.Style || "flux-dev-fast",
+        }));
 
-        if (uploadError) throw new Error(uploadError.message);
+        const { data: Photos, error: insertError } = await supabase
+          .from("photos")
+          .insert(photosData)
+          .select();
 
-        const { data: publicUrlData } = supabase.storage
-          .from("imagenfly")
-          .getPublicUrl(fileName);
-
-        return { url: publicUrlData?.publicUrl || "", fileName };
+        if (insertError) {
+          setError("Failed to save photos data: " + insertError.message);
+        } else {
+          setImageUrls((prevUrls) => [...prevUrls, ...results.map((result) => result.url)]);
+        }
       } catch (err) {
-        throw err instanceof Error ? err : new Error("Unknown error");
+        setError(`Error generating images: ${err instanceof Error ? err.message : "Unknown error"}`);
+      } finally {
+        setLoading(false);
       }
-    });
-
-    try {
-      const results = await Promise.all(imagePromises);
-
-      const photosData = results.map((result) => ({
-        url: result.url,
-        promp: prompt,
-        style: selectedStatus?.Style || "realistic",
-      }));
-
-      const { data: Photos, error: insertError } = await supabase
-        .from("photos")
-        .insert(photosData)
-        .select();
-
-      if (insertError) {
-        setError("Failed to save photos data: " + insertError.message);
-      } else {
-        setImageUrls((prevUrls) => [...prevUrls, ...results.map((result) => result.url)]);
-      }
-    } catch (err) {
-      setError(`Error generating images: ${err instanceof Error ? err.message : "Unknown error"}`);
-    } finally {
+    } else {
       setLoading(false);
     }
+
   };
 
   return (
@@ -270,7 +273,7 @@ export default function NewScreen() {
                 <div className="flex items-center gap-2 justify-between ">
                   <Dialog>
                     <DialogTrigger className="rounded-full p-2 bg-primary disabled:bg-primary/50" disabled={loading}>
-                        <Settings2Icon className="h-4 w-4 text-primary-foreground" />
+                      <Settings2Icon className="h-4 w-4 text-primary-foreground" />
                     </DialogTrigger>
                     <DialogContent className="h-96">
                       <DialogHeader>
@@ -351,7 +354,3 @@ export default function NewScreen() {
     </main>
   );
 }
-
-
-
-

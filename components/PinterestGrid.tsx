@@ -16,13 +16,12 @@ export default function PinterestGrid({ imageUrls }: { imageUrls: string[] }) {
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
-  const itemsPerPage = 10; // عدد الصور لكل طلب
+  const itemsPerPage = 10;
 
   const supabase = createClient();
   const observer = useRef<IntersectionObserver | null>(null);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
-  // جلب الصور من Supabase
   const fetchImages = useCallback(async () => {
     if (!hasMore || loading) return;
 
@@ -31,15 +30,29 @@ export default function PinterestGrid({ imageUrls }: { imageUrls: string[] }) {
       const from = page * itemsPerPage;
       const to = from + itemsPerPage - 1;
 
-      const { data, error } = await supabase
-        .from("photos")
-        .select("url, created_at")
-        .order("created_at", { ascending: false })
-        .range(from, to); // جلب دفعة جديدة فقط بناءً على الصفحة
+      const { data: { user } } = await supabase.auth.getUser();
+
+      let data, error;
+
+      // If user exists, fetch their photos, otherwise fetch all photos
+      if (user) {
+
+        ({ data, error } = await supabase
+          .from("photos")
+          .select("*")
+          .order("created_at", { ascending: false })
+          .eq("id_user", user.id)
+          .range(from, to));
+      } else {
+        ({ data, error } = await supabase
+          .from("photos")
+          .select("*")
+          .order("created_at", { ascending: false })
+          .range(from, to));
+      }
 
       if (error) throw error;
 
-      // إضافة الصور الجديدة فقط، مع تصفية التكرارات بناءً على URL
       setStoredImages((prev) => {
         const newImages = data || [];
         const existingUrls = new Set(prev.map((img) => img.url));
@@ -47,8 +60,8 @@ export default function PinterestGrid({ imageUrls }: { imageUrls: string[] }) {
         return [...prev, ...uniqueNewImages];
       });
 
-      setHasMore(data.length === itemsPerPage); // تحقق مما إذا كان هناك المزيد
-      setPage((prev) => prev + 1); // زيادة رقم الصفحة
+      setHasMore((data?.length ?? 0) === itemsPerPage);
+      setPage((prev) => prev + 1);
     } catch (err) {
       setError("Failed to load images from Supabase");
       console.error(err);
@@ -57,12 +70,10 @@ export default function PinterestGrid({ imageUrls }: { imageUrls: string[] }) {
     }
   }, [page, hasMore, loading]);
 
-  // جلب الدفعة الأولى عند التحميل الأولي
   useEffect(() => {
     fetchImages();
-  }, []);
+  }, [fetchImages]); // Added fetchImages as dependency
 
-  // إعداد Intersection Observer
   useEffect(() => {
     if (!loadMoreRef.current || !hasMore || loading) return;
 
@@ -85,7 +96,6 @@ export default function PinterestGrid({ imageUrls }: { imageUrls: string[] }) {
     };
   }, [fetchImages, hasMore, loading]);
 
-  // حساب ارتفاعات الصور
   useEffect(() => {
     const newImages = [...imageUrls]
       .reverse()
@@ -143,7 +153,7 @@ export default function PinterestGrid({ imageUrls }: { imageUrls: string[] }) {
               alt={`Image ${index}`}
               width={300}
               height={imageHeights[index] || 300}
-              className="w-full h-auto object-contain rounded-xl"
+              className="w-full h-auto object-contain rounded-xl min-w-52"
               loading="lazy"
               onError={() => console.error(`Image failed to load: ${image.url}`)}
             />
@@ -155,7 +165,7 @@ export default function PinterestGrid({ imageUrls }: { imageUrls: string[] }) {
           {loading ? "Loading..." : "Scroll to load more"}
         </div>
       )}
-        {allImages.length == 0 && loading && <div>No images found</div>}
+      {allImages.length === 0 && !loading && <div>No images found</div>}
     </div>
   );
 }

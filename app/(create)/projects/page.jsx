@@ -14,11 +14,14 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 
+import ima from "@/assets/images/Vector (3).svg";
+
 import TextUpdaterNode from "./TextUpdaterNode";
 import { Button } from "@/components/ui/button";
 import { ZoomSlider } from "@/components/zoom-slider";
 import { BookmarkIcon, LucideRotate3d, PlusCircleIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import Image from "next/image";
 
 const flowKey = "example-flow";
 
@@ -158,6 +161,12 @@ const AddNodeOnEdgeDrop = () => {
 
   const nodeTypes = useMemo(() => ({ textUpdater: TextUpdaterNode }), []);
 
+  const [inputValue, setInputValue] = useState("");
+
+  const onInputChange = useCallback((evt) => {
+    setInputValue(evt.target.value);
+  }, []);
+
   return (
     <div
       className="wrapper"
@@ -201,17 +210,19 @@ const AddNodeOnEdgeDrop = () => {
           className="flex justify-center items-center gap-1"
         >
           <div
-            className="w-80 h-20 rounded-lg p-1"
+            className="w-80 h-20 rounded-lg p-1 flex "
             style={{ backgroundColor: "#262626" }}
           >
+            <Image src={ima} alt="logo" className={`w-10`} />
             <Input
               id="text"
               name="text"
               className="w-full p-3 rounded border-none focus:outline-none"
               style={{ backgroundColor: "#6666ff00" }}
-              defaultValue={""}
+              value={inputValue} // Controlled input
+              onChange={onInputChange}
               placeholder="اكتب هنا..."
-            />
+            />{" "}
           </div>
         </Panel>
 
@@ -232,7 +243,7 @@ const AddNodeOnEdgeDrop = () => {
               backgroundColor: "#26262690",
               padding: "12px 8px",
               borderRadius: "50px",
-              scale: "1.2",
+              scale: "1.1",
             }}
           >
             <Button
@@ -402,7 +413,7 @@ const AddNodeOnEdgeDrop = () => {
           </div>
         </Panel>
 
-        <ZoomSlider position="bottom-right" />
+        <ZoomSlider position="top-right" />
         <Background />
       </ReactFlow>
     </div>

@@ -4,6 +4,7 @@ import { Handle, Position } from "@xyflow/react";
 import "@/app/globals.css";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import ima from "@/assets/images/Vector (3).svg"
 
 function TextUpdaterNode({ data, id, isConnectable }) {
   const onChange = useCallback(
@@ -91,7 +92,7 @@ function TextUpdaterNode({ data, id, isConnectable }) {
 
   return (
     <div
-      className="text-updater-node min-w-20 w-auto h-auto"
+      className="text-updater-node min-w-20 w-auto h-auto *:hover:bg-teal-500"
       style={{
         width: "100%",
         height: "auto",
@@ -111,8 +112,10 @@ function TextUpdaterNode({ data, id, isConnectable }) {
         style={{
           backgroundColor: "#6666ff",
           border: "none",
-          width: "10px",
-          height: "10px",
+          width: "0px",
+          height: "0px",
+          minHeight: "0px",
+          minWidth: "0px",
           borderRadius: "50%",
           cursor: "auto",
         }}
@@ -127,7 +130,7 @@ function TextUpdaterNode({ data, id, isConnectable }) {
               backgroundPosition: "center",
               width: "auto",
               height: "auto",
-              minWidth: "500px",
+              minWidth: "300px",
               borderRadius: "8px",
               border: "none",
               display: "flex",
@@ -142,7 +145,7 @@ function TextUpdaterNode({ data, id, isConnectable }) {
           <form
             onSubmit={handleSubmit}
             className="flex flex-col gap-2"
-            style={{ color: "white", padding: "10px", minWidth: "400px" }}
+            style={{ color: "white", padding: "10px", minWidth: "300px" }}
           >
             <div>
               <Input
@@ -206,21 +209,20 @@ function TextUpdaterNode({ data, id, isConnectable }) {
           </form>
         )}
       </div>
-
       {/* مقبض الاتصال السفلي */}
       <Handle
         type="source"
         position={Position.Bottom}
         isConnectable={isConnectable}
         style={{
-          backgroundColor: "#6666ff",
           border: "none",
           width: "10px",
           height: "10px",
-          borderRadius: "50%",
+          borderRadius: "100%",
           cursor: "auto",
-          bottom: "-5px", // تعديل الموضع ليكون مرئيًا
+          bottom: "-0px",
         }}
+        className="im"
       />
     </div>
   );
